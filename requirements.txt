@@ -1,0 +1,7 @@
+git+git://github.com/geopandas/geopandas.git
+git+git://github.com/CityScope/CS_Brix@master#egg=CS_Brix
+pygeos==0.9
+Rtree==0.9.7
+folium==0.12.1
+pandas==1.2.3
+fiona>=1.8
