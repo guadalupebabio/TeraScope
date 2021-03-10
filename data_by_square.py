@@ -1,14 +1,18 @@
+# 
+# This script generates the Databysquare.csv file
+# 
+# Input:
+#   * Manzanas.shp: This file comes from https://www.inegi.org.mx/contenidos/masiva/indicadores/inv/14_Manzanas_INV2016_shp.zip
+# 
+# Output:
+#   * Databysquare
+# 
+
 import pandas as pd
 import geopandas as gpd
 import matplotlib.pyplot as plt
-import shapely
-import gdal
-import pyproj
-import folium
 import numpy as np
 from brix import Handler
-import pygeos
-import rtree 
 import os
 
 local_projection="EPSG:3621" #https://spatialreference.org/ref/epsg/3621/ 
@@ -68,9 +72,8 @@ datframe_bysquare = data_join.groupby('id').sum()[["VIVTOT",'POBTOT','POB_WO_ELE
 datframe_bysquare[['POB_W_ELEC_NuclearBattery','POB_W_ELEC_SolarPanel']] = 0  #Columns to add so I can use when calculating accesibility
 datframe_bysquare['POB_W_ELEC'] = datframe_bysquare['POBTOT']-datframe_bysquare['POB_WO_ELEC'] #create new column for POB_W_ELEC
 
-out_directory = "/Users/babiog/Documents/GitHub/TeraScope/Data" #review directory
-new_folder = os.path.join(out_directory, 'Databysquare')
-if not os.path.exists(new_folder):
-    os.makedirs(new_folder)
-outpath = os.path.join(new_folder, 'Databysquare.csv')
+out_directory = "Data" #review directory
+if not os.path.exists(out_directory):
+  os.makedirs(out_directory)
+outpath = os.path.join(out_directory, 'Databysquare.csv')
 datframe_bysquare.to_csv(outpath) 
