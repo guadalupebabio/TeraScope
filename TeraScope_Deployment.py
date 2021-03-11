@@ -1,4 +1,4 @@
-# #source ~/myEnvs/tera/bin/activate
+# type on terminal: source ~/myEnvs/tera/bin/activate
 #
 # This script integrates the indicators and any modification of the grid
 # 
