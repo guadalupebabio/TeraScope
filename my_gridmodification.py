@@ -1,5 +1,5 @@
 def collapse_technology(geogrid_data):
-  default_type = 'Electricty_SolarPanel'
+  default_type = 'No_Technology'
   focus_type = 'Electricity_NuclearBattery'
   geogrid_data = geogrid_data.remove_noninteractive().as_df(include_geometries=True) 
   

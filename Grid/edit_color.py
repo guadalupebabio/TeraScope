@@ -23,8 +23,8 @@ with urllib.request.urlopen(get_url+'/GEOGRIDDATA') as url:
 
 for i_c, cell in enumerate(geogriddata):
   if i_c in id_list:
-    geogriddata[i_c]['interactive']=False #make interactive False
-    geogriddata[i_c]['color']=[0,0,1] #change the color to transparent [0,0,0,0]
+    # geogriddata[i_c]['interactive']=False #make interactive False
+    geogriddata[i_c]['color']=[0,0,0,0] #change the color to transparent [0,0,0,0]
 
 r = requests.post(post_url+'/GEOGRIDDATA', data = json.dumps(geogriddata))
 r
