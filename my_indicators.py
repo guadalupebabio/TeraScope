@@ -39,7 +39,7 @@ class Energy_related_Indicators(Indicator):
     '''
     Impact_Nuclear_Battery
     '''
-    self.NuclearBattery = 50000 #Energy released by that tech
+    self.NuclearBattery = 500000 #Energy released by that tech
     self.NuclearBattery_Access_POB = self.NuclearBattery / self.Cosumption_Person #number of people that have access to energy with one nuclear battery (one square)
 
 
@@ -73,11 +73,22 @@ class Energy_related_Indicators(Indicator):
     heatmap = self.return_indicator_asdf(geogrid_data)
     # Convert to json and export
     heatmap = json.loads(heatmap.to_json())
+
+    #radar
+    # radar =[
+    #   {'name': 'Social Wellbeing', 'value': 0.3, 'viz_type': 'radar'}, # WIP
+    #   {'name': 'Environmental Impact', 'value': 0.1, 'viz_type': 'radar'}, #WIP
+    #   {'name': 'Access to Energy', 'value': 0.5, 'viz_type': 'radar'}, #geogrid_data_df['Access_to_Energy'].sum()/len(geogrid_data_df['Access_to_Energy'])
+    #   {'name': 'Autonomy', 'value': 0.5, 'viz_type': 'radar'} #(geogrid_data_df['POB_W_ELEC_NB'].sum() + geogrid_data_df['POB_W_ELEC_OUT'].sum())/geogrid_data_df['POBTOT'].sum
+    # ]
+    # heatmap = heatmap, radar
+
     return heatmap
 
   def return_EnergyAccess(self):
     geogrid_data_df = self.geogrid_data_df
-    geogrid_data_df['Access_to_Energy'] = (geogrid_data_df['POB_W_ELEC'] + geogrid_data_df['Accesibility_Solar_Panel'] +geogrid_data_df['Accesibility_Nuclear_Battery'])/geogrid_data_df['POBTOT'] 
+    geogrid_data_df['POB_W_ELEC_percentage'] = geogrid_data_df['POB_W_ELEC']/geogrid_data_df['POBTOT']
+    geogrid_data_df['Access_to_Energy'] = geogrid_data_df['POB_W_ELEC_percentage'] + geogrid_data_df['Accesibility_Solar_Panel'] +geogrid_data_df['Accesibility_Nuclear_Battery']
     geogrid_data_df['Access_to_Energy'] = geogrid_data_df['Access_to_Energy'].fillna(0) #this shouldn't be 0, delete this line when Cris fix it
     out_AE_df = geogrid_data_df[['id','Access_to_Energy']]
     return out_AE_df
@@ -95,7 +106,7 @@ class Energy_related_Indicators(Indicator):
     '''
     geogrid_data_df = self.geogrid_data_df.copy()
     geogrid_data_graph = self.geogrid_data_graph
-    if len(geogrid_data_df[geogrid_data_df['name']==energy_name]):
+    if len(geogrid_data_df[geogrid_data_df['name']==energy_name])==0:
       print(f'WARNING: No {energy_name} found')
 
     geogrid_data_df.loc[geogrid_data_df['name']==energy_name,'POB_E_SP'] = self.SolarPanel_Access_POB #assign SolarPanel_Access_POB to all the rows that have solar panels
@@ -137,11 +148,13 @@ class Energy_related_Indicators(Indicator):
   def propagate_nuclear_battery (self,energy_name='Electricity_NuclearBattery',quietly=False):
     geogrid_data_df = self.geogrid_data_df
 
-    if len(geogrid_data_df[geogrid_data_df['name']==energy_name]):
+    if len(geogrid_data_df[geogrid_data_df['name']==energy_name])==0:
       print(f'WARNING: No {energy_name} found')
 
-    geogrid_data_df['POB_WO_ELEC_OUT'] = 0 #make sure this columns exists, necessary? 
-    geogrid_data_df['POB_W_ELEC_NB'] = 0 #make sure this columns exists, necessary? 
+    geogrid_data_df['POB_WO_ELEC_OUT'] = 0 
+    geogrid_data_df['POB_W_ELEC_OUT'] = geogrid_data_df['POB_W_ELEC_OUT'].fillna(0) #all the people that got energy from the solar panel
+    geogrid_data_df['POB_WO_ELEC_OUT'] = geogrid_data_df['POB_WO_ELEC'] -geogrid_data_df['POB_W_ELEC_OUT']  #population that still needs energy
+    geogrid_data_df['POB_W_ELEC_NB'] = 0 #initialize the column 'POB_W_ELEC_NB' with 0 values
 
     nuclearbattery_cells = geogrid_data_df[geogrid_data_df['POB_WO_ELEC_OUT']>0]
     cells_to_give_energy = set(nuclearbattery_cells['id']) 
@@ -168,3 +181,4 @@ class Energy_related_Indicators(Indicator):
     out_NB_df = geogrid_data_df[['id','Accesibility_Nuclear_Battery']] #reduce the output of the funcion to two columns
 
     return out_NB_df,remaining_energy_NB  
+
