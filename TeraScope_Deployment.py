@@ -3,6 +3,7 @@
 # pip uninstall cs-brix
 # pip install git+git://github.com/CityScope/CS_Brix.git@35e35a8051e118d184749e1feac7878bc75dc305
 #
+# pip install git+https://github.com/CityScope/CS_Brix.git@hybrid_indicators
 # This script integrates the indicators and any modification of the grid
 # 
 

@@ -25,7 +25,7 @@ class Energy_related_Indicators(Indicator):
     self.datframe_bysquare = None
     self.wgs84 = 'EPSG:4326'
 
-    self.indicator_type = 'heatmap' #cjeck if we can delete this one    
+    self.indicator_type = 'hybrid'    
 
     self.geogrid_data_df = None
     self.geogrid_data_graph = None
@@ -69,21 +69,22 @@ class Energy_related_Indicators(Indicator):
     heatmap = heatmap[['Accesibility_Solar_Panel','Accesibility_Nuclear_Battery','Access_to_Energy','geometry']]
     return heatmap 
   
-  def return_indicator(self, geogrid_data):
+  def return_indicator_heatmap(self, geogrid_data):
     heatmap = self.return_indicator_asdf(geogrid_data)
     # Convert to json and export
     heatmap = json.loads(heatmap.to_json())
 
-    #radar
-    # radar =[
-    #   {'name': 'Social Wellbeing', 'value': 0.3, 'viz_type': 'radar'}, # WIP
-    #   {'name': 'Environmental Impact', 'value': 0.1, 'viz_type': 'radar'}, #WIP
-    #   {'name': 'Access to Energy', 'value': 0.5, 'viz_type': 'radar'}, #geogrid_data_df['Access_to_Energy'].sum()/len(geogrid_data_df['Access_to_Energy'])
-    #   {'name': 'Autonomy', 'value': 0.5, 'viz_type': 'radar'} #(geogrid_data_df['POB_W_ELEC_NB'].sum() + geogrid_data_df['POB_W_ELEC_OUT'].sum())/geogrid_data_df['POBTOT'].sum
-    # ]
-    # heatmap = heatmap, radar
-
     return heatmap
+  
+  def return_indicator_numeric(self, geogrid_data):
+    radar =[
+      {'name': 'Social Wellbeing', 'value': 0.3, 'viz_type': 'radar'}, # WIP
+      {'name': 'Environmental Impact', 'value': 0.1, 'viz_type': 'radar'}, #WIP
+      {'name': 'Access to Energy', 'value': self.geogrid_data_df['Access_to_Energy'].sum()/len(self.geogrid_data_df['Access_to_Energy']), 'viz_type': 'radar'}, 
+      {'name': 'Autonomy', 'value': (self.geogrid_data_df['POB_W_ELEC_NB'].sum() + self.geogrid_data_df['POB_W_ELEC_OUT'].sum())/self.geogrid_data_df['POBTOT'].sum(), 'viz_type': 'radar'} 
+    ]
+
+    return radar
 
   def return_EnergyAccess(self):
     geogrid_data_df = self.geogrid_data_df
