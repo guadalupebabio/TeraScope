@@ -5,3 +5,5 @@ Rtree==0.9.7
 folium==0.12.1
 pandas==1.2.3
 fiona>=1.8
+#json ERROR: Could not find a version that satisfies the requirement json
+#requests

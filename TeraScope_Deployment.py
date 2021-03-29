@@ -14,11 +14,11 @@ from my_indicators import Energy_related_Indicators #Access_to_Sanitation, etc
 from my_gridmodification import collapse_technology
 
 
-# #Sanitation = Access_to_Sanitation()
+
 
 H = Handler('lomas', quietly=False)
 
-# Another way to make the line 28
+# Another way to make: '**{k:H.get_table_properties()[k] for k in ['cellSize','latitude','longitude']}'
 # props = H.get_table_properties()
 # Energy = Energy_related_Indicators(
 #         longitude=props['longitude'],
@@ -28,7 +28,7 @@ H = Handler('lomas', quietly=False)
 Energy = Energy_related_Indicators(
         **{k:H.get_table_properties()[k] for k in ['cellSize','latitude','longitude']}
 )
-
+# #Sanitation = Access_to_Sanitation()
 
 H.add_geogrid_data_update_function(collapse_technology)
 H.add_indicators([

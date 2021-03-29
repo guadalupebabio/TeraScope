@@ -1,5 +1,5 @@
 # 
-# This script generates the indicators later deployed in TeraScope_Deploymet.py Hi
+# This script generates the indicators later deployed in TeraScope_Deploymet.py 
 # 
 # Input:
 #   * Data/Databysquare.csv 
@@ -7,12 +7,13 @@
 # Output:
 #   * Energy_related_Indicators (Access_to_Energy, Impact_Solar_Panel, Impact_Nuclear_Battery)
 #       
-#get_solar_power_gen(lat, lon, area, scenario)
+
 
 import pandas as pd
 import numpy as np
 import json
 from brix import Indicator
+from Technologies/power import get_solar_power_gen #import a function from the file Power_Technologies
 
 class Energy_related_Indicators(Indicator):
   '''
@@ -33,13 +34,10 @@ class Energy_related_Indicators(Indicator):
     
     self.Cosumption_Person = 5000 #kW that a person uses
 
-
-
     '''
     Impact_Solar_Panel
     '''
-
-    self.SolarPanelDict = {scenario:get_solar_power_gen(latitude, longitude, cellSize, scenario) for scenario in scenario_set} #va a correr para los escenarios que le de
+    self.SolarPanelDict = {scenario:get_solar_power_gen(latitude, longitude, cellSize, scenario) for scenario in scenario_set} #this function request the value for PV calling the function from 
     #self.SolarPanelDict   = {0:2500, 1:3000, 3:4000}
     self.current_scenario = scenario_set[0]
 
@@ -51,13 +49,12 @@ class Energy_related_Indicators(Indicator):
     self.NuclearBattery = 500000 #Energy released by that tech
     self.NuclearBattery_Access_POB = self.NuclearBattery / self.Cosumption_Person #number of people that have access to energy with one nuclear battery (one square)
 
-def SolarPanel_Access_POB(self):
-  return self.SolarPanelDict[self.current_scenario] / self.Cosumption_Person
+  def SolarPanel_Access_POB(self):
+    return self.SolarPanelDict[self.current_scenario] / self.Cosumption_Person
 
   def load_module(self):
     datframe_bysquare = pd.read_csv('Data/Databysquare.csv')
     self.datframe_bysquare = datframe_bysquare[['id','POBTOT','POB_WO_ELEC','POB_W_ELEC']]
-
 
   def return_indicator_asdf(self, geogrid_data):
     self.initialize_simulation(geogrid_data)
