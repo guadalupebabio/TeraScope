@@ -1,9 +1,10 @@
 # type on terminal: source ~/myEnvs/tera/bin/activate
 # to upgarde brix: pip install --upgrade git+https://github.com/CityScope/CS_Brix.git
 # pip uninstall cs-brix
-# pip install git+git://github.com/CityScope/CS_Brix.git@35e35a8051e118d184749e1feac7878bc75dc305
+# To install a commit: pip install git+git://github.com/CityScope/CS_Brix.git@319b135b71aba18708e30b776e5b132ad959cb1c
 #
-# pip install git+https://github.com/CityScope/CS_Brix.git@hybrid_indicators
+# To install a branch: pip install git+https://github.com/CityScope/CS_Brix.git@hybrid_indicators
+#
 # This script integrates the indicators and any modification of the grid
 # 
 
@@ -12,14 +13,27 @@ from brix import Handler
 from my_indicators import Energy_related_Indicators #Access_to_Sanitation, etc
 from my_gridmodification import collapse_technology
 
-Energy = Energy_related_Indicators()
+
 # #Sanitation = Access_to_Sanitation()
 
 H = Handler('lomas', quietly=False)
+
+# Another way to make the line 28
+# props = H.get_table_properties()
+# Energy = Energy_related_Indicators(
+#         longitude=props['longitude'],
+#         cellSize =props['cellSize'],
+#         latitude =props['latitude']
+# )
+Energy = Energy_related_Indicators(
+        **{k:H.get_table_properties()[k] for k in ['cellSize','latitude','longitude']}
+)
+
+
 H.add_geogrid_data_update_function(collapse_technology)
 H.add_indicators([
         Energy #, 
         #Sanitation, ect
 ])
-H.listen()
+# H.listen()
 # print(H.update_package())
