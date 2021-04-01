@@ -3,6 +3,6 @@ TeraScope, an open-source module within the CityScope project that will allow lo
 https://github.com/CityScope
 
 
-To create a table on the CityScope editor: https://cityscope.media.mit.edu/CS_cityscopeJS/#/editor
-if you delete a type after you download without ‘recreate’ a new grid, it will crash. 
-Working on a script to generate the grid automatically (grid_lomas_generator) so the types can be edited easyly (lomas_types.json)
+To create a table on the CityScope
+-Opt 1: On its editor, https://cityscope.media.mit.edu/CS_cityscopeJS/#/editor (if you delete a type after you download without ‘recreate’ a new grid, it will crash)
+-Opt 2: The script Grid/edit_types.py generates the yable automatically with the types defined on lomas_types.json

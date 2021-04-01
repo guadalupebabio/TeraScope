@@ -1,6 +1,6 @@
 def collapse_technology(geogrid_data):
   default_type = 'No_Technology'
-  focus_type = 'Electricity_NuclearBattery'
+  focus_type = 'Power_NuclearReactor'
   geogrid_data = geogrid_data.remove_noninteractive().as_df(include_geometries=True) 
   
   NuclearBattery_cells = geogrid_data[geogrid_data.name.isin([focus_type])] #the split doen't work

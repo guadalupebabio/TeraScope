@@ -13,9 +13,6 @@ from brix import Handler
 from my_indicators import Energy_related_Indicators #Access_to_Sanitation, etc
 from my_gridmodification import collapse_technology
 
-
-
-
 H = Handler('lomas', quietly=False)
 
 # Another way to make: '**{k:H.get_table_properties()[k] for k in ['cellSize','latitude','longitude']}'
@@ -35,5 +32,5 @@ H.add_indicators([
         Energy #, 
         #Sanitation, ect
 ])
-# H.listen()
+H.listen()
 # print(H.update_package())
