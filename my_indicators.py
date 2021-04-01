@@ -184,7 +184,6 @@ class Energy_related_Indicators(Indicator):
       raise NameError('give_energy_cells_neighbors() returned a dataframe with different cell number')
     geogrid_data_df = geogrid_data_df.drop(['POB_E_SP','POB_WO_ELEC_SP','POB_W_ELEC_SP'],1,errors='ignore')
     geogrid_data_df = pd.merge(geogrid_data_df,simulated_energy)
-    print(geogrid_data_df['POB_E_SP'].sum())
     
     # Second iteration, if there is spare energy, use it to gain autonomy in the cells
     if geogrid_data_df['POB_E_SP'].sum() > 0:
@@ -200,8 +199,6 @@ class Energy_related_Indicators(Indicator):
 
     geogrid_data_df['Accesibility_Solar_Panel'] = geogrid_data_df['POB_W_ELEC_SP']/geogrid_data_df['POBTOT'] #percentage of people in that cell that recieve energy from a solar panel
     geogrid_data_df['Accesibility_Solar_Panel'] = geogrid_data_df['Accesibility_Solar_Panel'].fillna(0)
-    print('test')
-    print(geogrid_data_df['POB_E_SP_AfterAutonomy'] )
     remaining_energy_SP = geogrid_data_df['POB_E_SP_AfterAutonomy'].sum() 
     out_SP_df = geogrid_data_df[['id','Accesibility_Solar_Panel']] #reduce the output of the funcion to two columns
     self.geogrid_data_df = geogrid_data_df.copy()
