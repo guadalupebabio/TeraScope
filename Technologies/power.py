@@ -152,11 +152,9 @@ def get_nuclear_energy(cellSize, scenario):
 		https://www.westinghousenuclear.com/Portals/0/new%20plants/evincitm/eVinci%20Micro%20Reactor%20NPJ%20M-A%202019.pdf?ver=2019-04-30-211410-367 
 		https://www.westinghousenuclear.com/new-plants/evinci-micro-reactor
 		https://anpeg.mit.edu/about
-	
 	paramters:
 		cellSize : float : area of covered by each cell in terascope tool (m^2)
 			- this technology is not dependant upon area, however requires a minimum space of 231.886 m^2 (eq. to 2496 ft^2 = 0.06 acre) -> round to 235 m^2
-
 	returns:
 		dictionary including : "max_system_capacity_kWh", "annual_generation_kWh", "monthly_generation_kWh"
 			- one eVinci micro NR produces between 200 kWe and 500 MWe, meaning 200 kWh - 500,000 kWh
