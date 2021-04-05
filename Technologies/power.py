@@ -121,7 +121,6 @@ def get_solar_power(latitude, longitude, cellSize, scenario): #before get_solar_
 	scenario_monthly_pv_gen = []
 	if scenario ==0:
 		# 15% efficiency, generation (kWhac)
-		print('works_3')
 		scenario_annual_pv_gen = pv_watts_data["outputs"]["ac_annual"]
 		scenario_monthly_pv_gen = pv_watts_data["outputs"]["ac_monthly"]
 
@@ -137,11 +136,11 @@ def get_solar_power(latitude, longitude, cellSize, scenario): #before get_solar_
 		scenario_annual_pv_gen = round((pv_watts_data["outputs"]["ac_annual"]/current_eff)*future50_eff,2)
 		scenario_monthly_pv_gen = [round((i/current_eff)*future50_eff,2) for i in pv_watts_data["outputs"]["ac_monthly"]]
 
-	# results = {
-	# 	"system_capacity_kW":sys_cap, "latitude": latitude, "longitude": longitude, "scenario": scenario, 
-	# 	"annual_generation_kWh": scenario_annual_pv_gen, "monthly_generation_kWh": scenario_monthly_pv_gen}
-	results = 3300 #cell, 20m2. We put 6 panels with 550 kW/h of energy per year from each panel on your roof
-
+	results = {
+		"system_capacity_kW":sys_cap, "latitude": latitude, "longitude": longitude, "scenario": scenario, 
+		"annual_generation_kWh": scenario_annual_pv_gen, "monthly_generation_kWh": scenario_monthly_pv_gen}
+	# results = {"annual_generation_kWh": scenario_annual_pv_gen} #cell, 20m2. We put 6 panels with 550 kW/h of energy per year from each panel on your roof
+	# print(f'results:{results}')
 	return results
 
 
@@ -176,10 +175,9 @@ def get_nuclear_energy(cellSize, scenario):
 		min_monthly_generation_kWh = [200*24*30]*12
 		max_monthly_generation_kWh = [500000*24*30]*12
 
-		# results = {"min_system_capacity_kWh": min_system_capacity_kWh, "max_system_capacity_kWh": max_system_capacity_kWh, 
-		# 	"min_annual_generation_kWh": min_annual_generation_kWh, "max_annual_generation_kWh": c, 
-		# 	"min_monthly_generation_kWh": min_monthly_generation_kWh, "max_monthly_generation_kWh": max_monthly_generation_kWh}
-	results = max_annual_generation_kWh
+		results = {"min_system_capacity_kWh": min_system_capacity_kWh, "max_system_capacity_kWh": max_system_capacity_kWh, 
+			"min_annual_generation_kWh": min_annual_generation_kWh, "max_annual_generation_kWh": max_annual_generation_kWh, 
+			"min_monthly_generation_kWh": min_monthly_generation_kWh, "max_monthly_generation_kWh": max_monthly_generation_kWh}
 
 	return results
 
