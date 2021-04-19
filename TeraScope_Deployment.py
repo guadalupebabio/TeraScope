@@ -1,7 +1,7 @@
 # type on terminal: source ~/myEnvs/tera/bin/activate
 # to upgarde brix: pip install --upgrade git+https://github.com/CityScope/CS_Brix.git
 # pip uninstall cs-brix
-# To install a commit: pip install git+git://github.com/CityScope/CS_Brix.git@319b135b71aba18708e30b776e5b132ad959cb1c
+# To install a commit: pip install git+git://github.com/CityScope/CS_Brix.git@0aa8917d44c38a54b421569c75d9716134d548c8
 #
 # To install a branch: pip install git+https://github.com/CityScope/CS_Brix.git@hybrid_indicators
 #
@@ -32,5 +32,5 @@ H.add_indicators([
         Energy #, 
         #Sanitation, ect
 ])
-H.listen()
+# H.listen()
 # print(H.update_package())

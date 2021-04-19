@@ -7,9 +7,7 @@
 # Output:
 #   * Energy_related_Indicators (Access_to_Energy, Impact_Solar_Panel, Impact_nuclear_reactor)
 #       
-#NOT WORKING:  SolarPanel_Access_POB()
-#doubts: why do i need to call geogrid_data_df = self.geogrid_data_df within `give_energy_SP()`
-#how can i access geogrid_data_df['POB_E_SP'] within `give_energy_SP()`, its was a copy
+
 
 import pandas as pd
 import numpy as np
@@ -44,7 +42,7 @@ class Energy_related_Indicators(Indicator):
     '''
     scenario_set = [0,1,2]
     self.SolarPanelDict = {scenario:get_solar_power(latitude, longitude, cellSize, scenario)["annual_generation_kWh"] for scenario in scenario_set} #this function request the value for PV calling the function #this is how it will look like self.SolarPanelDict   = {0:2500, 1:3000, 3:4000}
-    self.current_scenario = scenario_set[0] # this will be an input later
+    self.current_scenario = scenario_set[0] #choose one scenario
 
     '''
     Impact_nuclear_reactor
@@ -52,12 +50,37 @@ class Energy_related_Indicators(Indicator):
     self.NuclearReactorDict = get_nuclear_energy(cellSize,scenario_set)["max_annual_generation_kWh"] #this function request the value for PV calling the function #this is how it will look like self.SolarPanelDict   = {0:2500, 1:3000, 3:4000}
     self.cells_with = {} #Create a dictionary
     self.remaining_energy = {} #Create a dictionary
+    
+  def set_current_scenario(self,geogrid_data):
+    '''
+    Define Current Scenario from the Grid
+    '''
+    time_cells = [886, 887, 888, 986, 987, 988, 1086, 1087, 1088] 
+    future_cells = set([])
+    geogrid_data_df = geogrid_data.as_df()
+
+    ###### Test, assign all the cells the year 2050
+    geogrid_data_df.loc[geogrid_data_df['id'].isin(time_cells),'name'] = '2050_Year'
+    #######
+
+    for i in time_cells:
+      if geogrid_data_df.set_index('id').loc[i]['name'] == '2050_Year':
+        future_cells.add(i)
+
+    if len(future_cells) >= 5: #the majority of the cells are future_cells
+      self.current_scenario = 1 #2050 scenario
+      print('The user has set up the 2050 Scenario, welcome to the Future!!')
+    else:
+      self.current_scenario = 0 #2021 scenario
+      print('The user has selected the 2021 Scenario.')
+    
+    return self.current_scenario
 
   def SolarPanel_Access_POB(self):
     '''
     This function calculate the amount of population that have access with each Solar panel created for each scenario
     '''
-    x = self.SolarPanelDict[self.current_scenario] / self.Cosumption_Person
+    return self.SolarPanelDict[self.current_scenario] / self.Cosumption_Person
   
   def NuclearReactor_Access_POB(self):
     '''
@@ -99,9 +122,11 @@ class Energy_related_Indicators(Indicator):
     energy_access = self.geogrid_data_df[['id','Access_to_Energy']]
     cells_with_SP_energy = self.cells_with['cells_with_SP_energy']
     cells_with_NR_energy = self.cells_with['cells_with_NR_energy']
+
     # Create a shapefile with points in the center of each cell
     heatmap = geogrid_data.remove_noninteractive().as_df(include_geometries=True) #exclude non interative #if this line is unomented remove include geometies from initialize()
     heatmap.geometry = heatmap.geometry.centroid #each poin of the heatmap is for the centroide of the cells 
+    
     # Merge with layers
     heatmap = pd.merge(heatmap,cells_with_SP_energy)
     heatmap = pd.merge(heatmap,cells_with_NR_energy)
@@ -110,7 +135,6 @@ class Energy_related_Indicators(Indicator):
     # Select relevant collumns
     heatmap = heatmap[['Accesibility_Solar_Panel','Accesibility_nuclear_reactor','Access_to_Energy','geometry']]
     print('Heatmap works!')
-
     # Convert to json and export
     heatmap = json.loads(heatmap.to_json())
     return heatmap
@@ -145,16 +169,16 @@ class Energy_related_Indicators(Indicator):
     geogrid_data_df['POB_W_ELEC_percentage'] = geogrid_data_df['POB_W_ELEC_percentage'].fillna(0)
     geogrid_data_df['Access_to_Energy'] = geogrid_data_df['POB_W_ELEC_percentage'] + geogrid_data_df['Accesibility_Solar_Panel'] + geogrid_data_df['Accesibility_nuclear_reactor']
     geogrid_data_df['Access_to_Energy'] = geogrid_data_df['Access_to_Energy'].fillna(0) 
+
     out_AE_df = geogrid_data_df[['id','Access_to_Energy']]
     self.geogrid_data_df = self.geogrid_data_df.drop('Access_to_Energy',1,errors='ignore')
     self.geogrid_data_df = pd.merge(self.geogrid_data_df,out_AE_df,how='left')
 
   def initialize_simulation(self, geogrid_data):
+    self.set_current_scenario(geogrid_data) #this is the function that identifies what scenario is running
     geogrid_data_df = geogrid_data.remove_noninteractive().as_df() #creates a dataframe
     geogrid_data_df = pd.merge(geogrid_data_df,self.datframe_bysquare,how='left').fillna(0)
     geogrid_data_df.loc[geogrid_data_df['POB_WO_ELEC']<0,'POB_WO_ELEC'] = 0 
-    # self.current_scenario = geogrid_data.current_scenario() # This is not yet implemented, and it depends on Ariel's good grace
-    self.current_scenario = 0
     self.geogrid_data_df = geogrid_data_df.copy()
     if self.geogrid_data_graph is None:
       self.geogrid_data_graph = geogrid_data.as_graph() #creates a graph
@@ -287,8 +311,6 @@ class Energy_related_Indicators(Indicator):
     geogrid_data_df[tech_energy_col] = geogrid_data_df[lack_energy_col] - geogrid_data_df[lack_energy_out_col]
 
     return geogrid_data_df[['id',free_energy_out_col,lack_energy_out_col,tech_energy_col]]
-  
-
   
   def propagate_nuclear_reactor (self,energy_name='Power_NuclearReactor',quietly=False):
     geogrid_data_df = self.geogrid_data_df

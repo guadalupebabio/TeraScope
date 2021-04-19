@@ -54,9 +54,8 @@ shapefile[['CVEGEO',"VIVTOT",'VIV_WO_ELEC','POBTOT','POB_WO_ELEC','geometry']] #
 H = Handler('lomas', quietly=False)
 
 #make sure table is connected
-geogrid_data = H.get_geogrid_data(include_geometries=True,as_df=True,exclude_noninteractive=True)
-geogrid_data = geogrid_data.set_crs(crs=wgs84)
-geogrid_data = geogrid_data.to_crs(local_projection)
+geogrid_data = H.get_geogrid_data()
+geogrid_data = geogrid_data.remove_noninteractive().as_df(include_geometries=True) 
 
 ######################## join the two GeoDataFrames ########################
 data_join = gpd.sjoin(geogrid_data[['id','geometry']], shapefile[['CVEGEO',"VIVTOT",'VIV_WO_ELEC','POBTOT','POB_WO_ELEC','geometry']], op='intersects') #geopandas.sjoin(left_df, right_df, how='inner', op='intersects', lsuffix='left', rsuffix='right')
@@ -69,8 +68,8 @@ for colname in ["VIVTOT",'VIV_WO_ELEC','POBTOT','POB_WO_ELEC']:
 
 ######################## create the Dataframe to be exported and add everything inside the same id ########################
 datframe_bysquare = data_join.groupby('id').sum()[["VIVTOT",'POBTOT','POB_WO_ELEC']].reset_index()
-datframe_bysquare[['POB_W_ELEC_NuclearBattery','POB_W_ELEC_SolarPanel']] = 0  #Columns to add so I can use when calculating accesibility
-datframe_bysquare['POB_W_ELEC'] = datframe_bysquare['POBTOT']-datframe_bysquare['POB_WO_ELEC'] #create new column for POB_W_ELEC
+datframe_bysquare['POB_WO_ELEC'] = abs(datframe_bysquare['POB_WO_ELEC']) #some values are negative so we consider the absolute of all values
+datframe_bysquare['POB_W_ELEC'] = datframe_bysquare['POBTOT']-datframe_bysquare['POB_WO_ELEC']
 
 out_directory = "Data" #review directory
 if not os.path.exists(out_directory):
