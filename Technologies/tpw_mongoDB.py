@@ -7,7 +7,6 @@ import pymongo
 from pprint import pprint
 
 username = 'acfiallo'
-password = "MAS%21ELO%21UROP%212021"
 # set MongoDB connection URL 
 tpw_connection_URL = "mongodb+srv://"+username+":"+password+"@cluster0.d6pne.mongodb.net/the_power_of_without?authSource=admin&retryWrites=true&w=majority"
 # tpw_standard_URL = "mongodb://"+username+":"+password+"@cluster0.d6pne.mongodb.net/?authSource=admin"
