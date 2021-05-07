@@ -179,6 +179,133 @@ def get_nuclear_energy(cellSize, scenario):
 
 	return results
 
+def get_hydropower(scenario, river_size):
+	'''
+	param scenario : int [0, 1, 2] : Timeline, this will change the efficiencies according to the predictions for small/micro hydropower systems
+		0 represents the present : efficiency = 70%
+		1 represents +10 years : efficiency = 80%
+		2 represents +50 years : efficiency = 90%
+	param river_size : str ['small', 'medium', 'mainstem', 'large'] : the size of river determines the flow rate of the river, 
+																	which then determines the overall power output of the system
+			US river stream classifications:
+				- small river = 1.133 - 5.663 m^3/s = 1133 - 5663 kg/s
+				- medium river = 5.663 - 22.65 m^3/s = 5663 - 22650 kg/s
+				- mainstem = 22.65 - 70.79 m^3/s = 22650 - 70790 kg/s
+				- large river = 70.79 - 283.2 m^3/s = 70790 -283200 kg/s
+
+	* note: large scale hydropower systems have an efficiency of 90% today, however we are considering the case of small/micro hydropower
+
+	initial approach to hydropower included tracking water resources near informal settlement, however this approach was too complicated for the limited time.
+	future research should include attempting this approach using the water resource data provided by earth engine (this was already started in file hydropower_earthengine.py)
+	
+	Current approach includes assuming many factors regarding water resource access and the potential energy from the water current. 
+	assumptions include: 
+		- there is access to a running water source with sufficient current/energy to power micro-hydropower source
+		- access to this is enough to bring energy through distribution pipes to community
+		- net head elevation = 30 m = 100 ft
+		- US river stream classifications
+			small river = 1.133 - 5.663 m^3/s = 1133 - 5663 kg/s
+			medium river = 5.663 - 22.65 m^3/s = 5663 - 22650 kg/s
+			mainstem = 22.65 - 70.79 m^3/s = 22650 - 70790 kg/s
+			large river = 70.79 - 283.2 m^3/s = 70790 -283200 kg/s
+
+	After assumptions are made, the potential energy provided by hypdropower is computed, cost of system, area needed by system, etc. 
+	'''
+	# efficiencies of small/micro hydropower systems = 0 (today), 1 (10+ years), 2 (50 + years)
+	scenario_efficiency_microhydro = {0: 0.70, 1: 0.80, 2: 0.90}
+	efficiency = scenario_efficiency_microhydro[scenario]
+	
+	# average river discharges (kg/s) by river size
+	avg_river_discharge = {'small': 3398, 'medium': 14157, 'mainstem': 46720, 'large': 177000}
+
+	# micro-hydropwoer plant average capacity size: elevation change (m) x discharge flow rate (kg/s) x 10 (conversion of kg*m/s -> W) = W
+	elevation_m = 30
+
+	# determine the flowrate by river size & compute system capacity
+	flow_rate = avg_river_discharge[river_size]
+	capacity_kW = efficiency*elevation_m*flow_rate*10/1000
+
+	# compute annual and monthly power generation of system
+	annual_generation_kWh = capacity_kW*24*365
+	monthly_generation_kWh = [capacity_kW*24*30]*12
+
+	# cost calculations, cost functions based off of www.hydro.org cost metrics
+	cost = 0
+	if capacity_kW <= 1000:
+		cost = (4000 + 2*capacity_kW)*capacity_kW
+
+	else:
+		cost = (1000 + 5*capacity_kW)*capacity_kW
+
+	results = {'scenario': scenario, 'efficiency (in decimals)': efficiency, 'river size': river_size, 'river discharge (kg/s)': flow_rate,
+			"system capacity [kW]": capacity_kW, "system cost $": cost, "annual generation [kWh]": annual_generation_kWh, 
+			"monthly generation [kWh]": monthly_generation_kWh}
+
+	return results
+	
+def get_geothermal_energy(population, scenario):
+	'''
+	param population : type int : population of the informal settlement
+	param scenario : int [0, 1, 2] : Timeline, this will change the Coefficient of performance (CoP) according to the predictions for the technology
+		0 represents the present : CoP = 3.75 
+		1 represents +10 years : CoP = 4.25
+		2 represents +30 years : CoP = 4.75
+
+	Using these two parameters, calculates the necessary capacity, cost, and generation of the 
+	community-scale geothermal heat pump system (GHPS)
+	
+	Important notes:
+		- according to EIA, 70% of household energy consumption is used for heating, cooling, ventillation, etc (HVAC)
+		- according to EIA, average energy consumption per person per year = 305M Btu = 89,387 kWh => 245 kWh/person/day = 10.2 kW/person
+			- average energy consumption of world = 3 kW/person
+		- Coefficient of Performance = 3.5-4.0 -> for every unit of electricity input into compression, 3.5-4 units of HVAC are produced
+	'''
+	# calculate the needed capacity of the GHPS in kW
+	consumption = 3*population
+	scenario_coeff_performance = {0: 3.75, 1: 4.25, 2: 4.75}
+
+	def geothermal_CoP(CoP):
+		capacity = 0.5*consumption/CoP
+
+		# pipe_network represents the length of pipes that connect from central system to houses in meters 
+		# see Energy Tech document for details on assumptions of pipe lenght
+		pipe_network = 0
+		if population <= 300:
+			pipe_network = 750
+
+		elif population <= 750:
+			pipe_network = 1500
+
+		elif population <= 1500:
+			pipe_network = 2250
+
+		elif population < 3000:
+			pipe_network = 3000
+
+		else:
+			pipe_network = population
+
+		# Cost GHP for a community development = $2,500/ton = $2,500/3.5 kW
+		# multiply times capacity [kW] = $
+		cost = 2500/3.5*capacity 
+		
+		annual_generation_kWh = capacity*24*365
+		monthly_generation_kWh = [capacity*24*30]*12
+
+		energy_density = 0.05
+
+		results = {"CoP": CoP, "system capacity [kW]": capacity, "system cost $": cost, "annual generation [kWh]": annual_generation_kWh, 
+				"monthly generation [kWh]": monthly_generation_kWh, "energy density [J/m^3]": energy_density}
+
+		return results
+
+	CoP = scenario_coeff_performance[scenario]
+	scenario_results = {"scenario" : scenario}
+	geo_results = geothermal_CoP(CoP)
+	
+	scenario_results.update(geo_results)
+
+	return scenario_results
 
 # EXAMPLES #
 #########################################################################
@@ -211,3 +338,29 @@ def get_nuclear_energy(cellSize, scenario):
 # 'min_annual_generation_kWh': 1752000, 'max_annual_generation_kWh': 4380000000, 
 # 'min_monthly_generation_kWh': [144000, 144000, 144000, 144000, 144000, 144000, 144000, 144000, 144000, 144000, 144000, 144000], 
 # 'max_monthly_generation_kWh': [360000000, 360000000, 360000000, 360000000, 360000000, 360000000, 360000000, 360000000, 360000000, 360000000, 360000000, 360000000]}
+
+#########################################################################
+## EXAMPLE GET_HYDROPOWER
+#########################################################################
+# hydro = get_hydropower(scenario = 0, river_size = 'small')
+# print(hydro)
+
+###############################
+# OUTPUT GET_HYDROPOWER
+###############################
+# {'scenario': 0, 'efficiency (in decimals)': 0.7, 'river size': 'small', 'river discharge (kg/s)': 3398, 
+# 'system capacity [kW]': 713.58, 'system cost $': 3872712.8328, 'annual generation [kWh]': 6250960.800000001, 
+# 'monthly generation [kWh]': [513777.60000000003, 513777.60000000003, 513777.60000000003, 513777.60000000003, 513777.60000000003, 513777.60000000003, 513777.60000000003, 513777.60000000003, 513777.60000000003, 513777.60000000003, 513777.60000000003, 513777.60000000003]}
+
+#########################################################################
+## EXAMPLE GET_GEOTHERMAL_ENERGY
+#########################################################################
+# geo = get_geothermal_energy(population = 30000, scenario = 0)
+# print(geo)
+
+###############################
+# OUTPUT GET_GEOTHERMAL_ENERGY
+###############################
+# {'scenario': 0, 'CoP': 3.75, 'system capacity [kW]': 12000.0, 'system cost $': 8571428.571428573, 
+# 'annual generation [kWh]': 105120000.0, 
+# 'monthly generation [kWh]': [8640000.0, 8640000.0, 8640000.0, 8640000.0, 8640000.0, 8640000.0, 8640000.0, 8640000.0, 8640000.0, 8640000.0, 8640000.0, 8640000.0], 'energy density [J/m^3]': 0.05}
