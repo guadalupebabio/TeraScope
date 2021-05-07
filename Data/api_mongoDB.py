@@ -1,23 +1,37 @@
+#
 # API call to MongoDB TPW data
+#
+# Input :  Name of the settlement
+# 
+# Output : Population, Coordinates (Polygon), Access to Energy
+#
 
 # https://www.mongodb.com/blog/post/getting-started-with-python-and-mongodb
 import pymongo
+import numpy as np
+import getpass
 
-# pprint library is used to make the output look more pretty
 from pprint import pprint
+from shapely.geometry.polygon import Polygon
+
 
 username = 'table-creator'
-password = ''
+password =  getpass.getpass() #located in the .env file
 
-def coordinate_format(coordinates):
-	'''
-	Changes coordinates to city scope format
-	'''
-	out_coordinates = []
-	for c in coordinates:
-		out_coordinates.append({"$numberDouble": str(c)})
-
-	return out_coordinates
+def coordinates_to_polygon(coords):
+    '''
+    This function takes the coordinates from Mongo and transforms them into a polygon 
+    '''
+    points = []
+    for i in range(0, len(coords)-1, 2):
+      lat = coords[i]
+      lon = coords[i+1]
+      points.append((lat, lon))
+    lats_vect = np.array([point[0] for point in points])
+    lons_vect = np.array([point[1] for point in points])
+    lons_lats_vect = np.column_stack((lons_vect, lats_vect))
+    polygon = Polygon(lons_lats_vect) # create polygon
+    return polygon
 
 def get_mongo(settlement_name=None):
 	'''
@@ -39,7 +53,7 @@ def get_mongo(settlement_name=None):
 	# connect to MongoDB, change the << MONGODB URL >> to reflect your own connection string
 	client = pymongo.MongoClient(tpw_connection_URL)
 
-	# CHECK CONNECTION
+    # CHECK CONNECTION
 	db = client.admin
 	serverStatusResult=db.command("ServerStatus")
 	pprint(serverStatusResult)
@@ -78,7 +92,7 @@ def get_mongo(settlement_name=None):
 			# print(settlement_name_data)
 			settlement_coordinates = settlement_name_data['geolocation']['coordinates']
 			# fix format of coordinates
-			# formatted_settlement_coordinates = coordinate_format(settlement_coordinates)
+
 			## GET SETTLEMENT POPULATION ##
 			settlement_population = settlement_name_data['site']['origin']['population']
 
@@ -94,8 +108,12 @@ def get_mongo(settlement_name=None):
 		except:
 			raise NameError('Settlement is not registered in the database.')
 
-name = 'Lomas del Centinela, Zapopan'
-get_mongo(name)
+
+## HOW IT WORKS ##
+# name = 'Lomas del Centinela, Zapopan'
+# settlement_data = get_mongo(name)
+# settlement_polygon = coordinates_to_polygon(settlement_data['coordinates'])
+
 
 # get_mongo()
 # ERROR when connecting to TPW : pymongo.errors.OperationFailure: bad auth : Authentication failed., full error: {'ok': 0, 'errmsg': 'bad auth : Authentication failed.', 'code': 8000, 'codeName': 'AtlasError'}

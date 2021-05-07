@@ -150,15 +150,19 @@ class Energy_related_Indicators(Indicator):
     return radar
 
   def return_indicator_textual(self,geogrid_data):
-      textual = [{
-        'id': 40,
-        'info': "You don't need this technology"
-      },{
-        'id': 9249,
-        'info': "This technology has increased the autonomy of Lomas"
-      }]
-      print('Textual works!')
-      return textual
+    if self.current_scenario == 1:
+      scenario_txt = '2050 scenario'
+    else:
+      scenario_txt = '2021 scenario'
+    textual = [{
+      'id': 787,
+      'info': scenario_txt
+    },{
+      'id': 9249,
+      'info': "This technology has increased the autonomy of Lomas"
+    }]
+    print('Textual works!')
+    return textual
 
   def calculate_EnergyAccess(self):
     '''
@@ -312,7 +316,7 @@ class Energy_related_Indicators(Indicator):
 
     return geogrid_data_df[['id',free_energy_out_col,lack_energy_out_col,tech_energy_col]]
   
-  def propagate_nuclear_reactor (self,energy_name='Power_NuclearReactor',quietly=False):
+  def propagate_nuclear_reactor (self,energy_name='Power_NuclearBattery',quietly=False):
     geogrid_data_df = self.geogrid_data_df
     geogrid_data_graph= self.geogrid_data_graph 
 

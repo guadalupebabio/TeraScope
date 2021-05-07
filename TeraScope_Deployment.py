@@ -1,9 +1,10 @@
 # type on terminal: source ~/myEnvs/tera/bin/activate
 # to upgarde brix: pip install --upgrade git+https://github.com/CityScope/CS_Brix.git
 # pip uninstall cs-brix
+# To insyall Brix fomr github: pip install git+https://github.com/CityScope/CS_Brix.git
 # To install a commit: pip install git+git://github.com/CityScope/CS_Brix.git@0aa8917d44c38a54b421569c75d9716134d548c8
 #
-# To install a branch: pip install git+https://github.com/CityScope/CS_Brix.git@hybrid_indicators
+# To install a branch: pip install -e git://github.com/CityScope/CS_Brix.git@grid_maker#egg=cs_brix
 #
 # This script integrates the indicators and any modification of the grid
 # 
@@ -32,5 +33,5 @@ H.add_indicators([
         Energy #, 
         #Sanitation, ect
 ])
-# H.listen()
+H.listen()
 # print(H.update_package())

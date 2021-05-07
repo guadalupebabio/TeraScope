@@ -170,7 +170,7 @@ def get_nuclear_energy(cellSize, scenario):
 		min_annual_generation_kWh = 200*24*365
 		max_annual_generation_kWh = 500000*24*365
 
-		min_monthly_generation_kWh = [200*24*30]*12
+		min_monthly_generation_kWh = [200*24*30]*12 #this should be divided no?
 		max_monthly_generation_kWh = [500000*24*30]*12
 
 		results = {"min_system_capacity_kWh": min_system_capacity_kWh, "max_system_capacity_kWh": max_system_capacity_kWh, 

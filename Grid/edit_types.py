@@ -20,7 +20,7 @@ lat_point_list = [20.764781341419358, 20.76303528674933, 20.763215914030038, 20.
 lon_point_list = [-103.36270688388338,-103.36274981993364,-103.3615690785509,-103.36227752338053,-103.36176229077716,-103.36077476162069,-103.35710590345617,-103.35873747336686,-103.35841545298975, -103.36019729907642,-103.36146340784991,-103.36176355384579,-103.36681530234735,-103.36631873727687,-103.36723112834531,-103.36669703771352,-103.37101723758293,-103.36673933187646,-103.36523770894898,-103.36399256349084,-103.36373494718914,-103.3603015332957,-103.36216925148294]
 polygon_geom = Polygon(zip(lon_point_list, lat_point_list))
 
-default_type = '2021_Year'#'No_Technology'
+default_type = 'No_Technology'
 timing_now_type = '2021'
 timing_future_type = '2025'
 new_types=json.load(open('type_definitions/lomas_types.json'))
@@ -57,12 +57,10 @@ if overwrite=='y':
   with open(geogrid_out_fname, 'w') as f:
     json.dump(geogrid, f)
 
-r = requests.post(H.cityIO_post_url.strip('/')+'/GEOGRID/', data = json.dumps(geogrid))
-# r = requests.post(H.cityIO_post_url.strip('/')+'/GEOGRID/properties', data = json.dumps(geogrid['properties'])) # deep post, only available in the next cityio version
+r = requests.post(H.cityIO_GEOGRID_post_url, data=json.dumps(geogrid), headers=Handler.cityio_post_headers)
 print(r.url)
 if r.status_code == 413:
   raise NameError('Package too large, exit status {r.status_code}')
-# print(r)
-
+print(r)
 
 H.reset_geogrid_data()
