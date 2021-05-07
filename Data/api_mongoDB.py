@@ -90,15 +90,25 @@ def get_mongo(settlement_name=None):
 			## GET SETTLEMENT COORDINATES ##
 			settlement_name_data = db.settlementdatas.find_one({'name': settlement_name})
 			# print(settlement_name_data)
-			settlement_coordinates = settlement_name_data['geolocation']['coordinates']
+
+			settlement_coordinates = None
+			if settlement_name_data['geolocation']['coordinates'] is not None:
+				settlement_coordinates = settlement_name_data['geolocation']['coordinates']
 			# fix format of coordinates
 
 			## GET SETTLEMENT POPULATION ##
-			settlement_population = settlement_name_data['site']['origin']['population']
+			settlement_population = None
+			if settlement_name_data['site']['origin']['population'] is not None:
+				settlement_population = settlement_name_data['site']['origin']['population']
 
 			## GET SETTLEMENT ACCESS TO & SOURCE ENERGY ##
-			settlement_accessToEnergy = settlement_name_data['architecture']['infrastructure']['accessToEnergy']
-			settlement_sourceOfEnergy = settlement_name_data['architecture']['infrastructure']['sourceOfEnergy'][0]
+			settlement_accessToEnergy = None
+			if settlement_name_data['architecture']['infrastructure']['accessToEnergy'] is not None:
+				settlement_accessToEnergy = settlement_name_data['architecture']['infrastructure']['accessToEnergy']
+			
+			settlement_sourceOfEnergy = None
+			if settlement_name_data['architecture']['infrastructure']['sourceOfEnergy'][0] is not None:
+				settlement_sourceOfEnergy = settlement_name_data['architecture']['infrastructure']['sourceOfEnergy'][0]
 
 			one_settlement_data = {'name': settlement_name, 'coordinates': settlement_coordinates, 'population': settlement_population, 
 					'accessToEnergy': settlement_accessToEnergy, 'sourceOfEnergy': settlement_sourceOfEnergy}
