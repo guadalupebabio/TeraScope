@@ -15,7 +15,7 @@
 import requests
 import json
 
-# solar energy technology
+# PV SOLAR ENERGY TECHNOLOGY
 def get_solar_power(latitude, longitude, cellSize, scenario): #before get_solar_power_gen(lat, lon, area)
 	'''
 	this function will be called directly from Terascope Tool; will call the pv_watts_get function to get necessary solar data.
@@ -138,13 +138,14 @@ def get_solar_power(latitude, longitude, cellSize, scenario): #before get_solar_
 
 	results = {
 		"system_capacity_kW":sys_cap, "latitude": latitude, "longitude": longitude, "scenario": scenario, 
-		"annual_generation_kWh": scenario_annual_pv_gen, "monthly_generation_kWh": scenario_monthly_pv_gen}
+		"annual_generation_kWh": scenario_annual_pv_gen, "monthly_generation_kWh": scenario_monthly_pv_gen,
+		'energy density [J/m^3]': 0.0000015, 'GHG emissions (gCO2e/MJ)': 11.4}
 	# results = {"annual_generation_kWh": scenario_annual_pv_gen} #cell, 20m2. We put 6 panels with 550 kW/h of energy per year from each panel on your roof
 	# print(f'results:{results}')
 	return results
 
 
-# nuclear energy technology
+# NUCLEAR ENERGY TECHNOLOGY
 def get_nuclear_energy(cellSize, scenario):
 	'''
 	this function will be called directly from Terascope Tool. it leverages MIT ANPEG research and Westinghouse product - eVinci micro nuclear reactor.
@@ -175,10 +176,12 @@ def get_nuclear_energy(cellSize, scenario):
 
 		results = {"min_system_capacity_kWh": min_system_capacity_kWh, "max_system_capacity_kWh": max_system_capacity_kWh, 
 			"min_annual_generation_kWh": min_annual_generation_kWh, "max_annual_generation_kWh": max_annual_generation_kWh, 
-			"min_monthly_generation_kWh": min_monthly_generation_kWh, "max_monthly_generation_kWh": max_monthly_generation_kWh}
+			"min_monthly_generation_kWh": min_monthly_generation_kWh, "max_monthly_generation_kWh": max_monthly_generation_kWh,
+			"energy density [J/m^3]": 2.2*10**17, "GHG emissions (gCO2e/MJ)": 3.33}
 
 	return results
 
+# HYDROPOWER TECHNOLOGY
 def get_hydropower(scenario, river_size):
 	'''
 	param scenario : int [0, 1, 2] : Timeline, this will change the efficiencies according to the predictions for small/micro hydropower systems
@@ -239,10 +242,11 @@ def get_hydropower(scenario, river_size):
 
 	results = {'scenario': scenario, 'efficiency (in decimals)': efficiency, 'river size': river_size, 'river discharge (kg/s)': flow_rate,
 			"system capacity [kW]": capacity_kW, "system cost $": cost, "annual generation [kWh]": annual_generation_kWh, 
-			"monthly generation [kWh]": monthly_generation_kWh}
+			"monthly generation [kWh]": monthly_generation_kWh, "energy density [J/m^3]": 7*10**5, "GHG emissions (gCO2e/MJ)": 5.14}
 
 	return results
-	
+
+# GEOTHERMAL TECHNOLOGY
 def get_geothermal_energy(population, scenario):
 	'''
 	param population : type int : population of the informal settlement
@@ -295,7 +299,7 @@ def get_geothermal_energy(population, scenario):
 		energy_density = 0.05
 
 		results = {"CoP": CoP, "system capacity [kW]": capacity, "system cost $": cost, "annual generation [kWh]": annual_generation_kWh, 
-				"monthly generation [kWh]": monthly_generation_kWh, "energy density [J/m^3]": energy_density}
+				"monthly generation [kWh]": monthly_generation_kWh, "energy density [J/m^3]": 0.05, "GHG emissions (gCO2e/MJ)": 25}
 
 		return results
 
@@ -306,6 +310,73 @@ def get_geothermal_energy(population, scenario):
 	scenario_results.update(geo_results)
 
 	return scenario_results
+
+# HYDROGEN TECHNOLOGY
+def get_hydrogen_energy(population, scenario, hydrogen_type):
+	'''
+	param population : type int : population of informal settlement
+	param area : type double : area of informal settlement
+	param scenario : int [0, 1, 2] : Timeline, this will change the efficiencies according to the predictions for small/micro hydropower systems
+		0 represents the present : efficiency = 50% (power plants >300kW), 60% (power plants <300kW)
+		1 represents +10 years : efficiency = 60% (power plants >300kW), 70% (power plants <300kW)
+		2 represents +50 years : efficiency = 70% (power plants >300kW), 80% (power plants <300kW)
+			* max theoretical efficiency of hydrogen fuel cells is ~80%
+	param hydrogen_type : str [grey, blue, green] : 
+		Hydrogen is not an energy source, but rather an energy carrier. Ways to produce hydrogen:
+			- Grey: using natual gas as a fuel, does not have 0 emissions
+			- Blue: using natural gas and carbon capture to reduce emissions
+			- Green: using renenwable energy electricity as a fuel
+		* energy density of hydrogen = 33.6 kWh/kg
+		* electrolysis (electrochemical process used to produce H) has efficiency = 65%-70%
+
+	Once hydrogen is produced, a fuel cell is used to convert hydrogen to electricity through an electrochemical process
+	that combines hydrogen and oxygen, generating electrons and water vapor as a byproduct.
+
+	Important notes:
+		- according to EIA, 70% of household energy consumption is used for heating, cooling, ventillation, etc (HVAC)
+		- according to EIA, average energy consumption per person per year = 305M Btu = 89,387 kWh => 245 kWh/person/day = 10.2 kW/person
+			- average energy consumption of world = 3 kW/person
+	'''
+	
+	# calculate the needed capacity of the hydrogen power plant in kW
+	consumption = 3*population
+	capacity_kW = consumption
+
+	# different hydrogren production processes have distinct costs and GHG emissions associated
+	hydrogen_production_types = {'grey': {'cost ($/kgH)': 2.00, 'GHG emissions (gCO2e/MJ)': 91.0}, 
+		'blue': {'cost ($/kgH)': 3.00, 'GHG emissions (gCO2e/MJ)': 36.4}, 
+		'green': {'cost ($/kgH)': 4.50, 'GHG emissions (gCO2e/MJ)': 11.4}}
+	
+	hydrogen_production = hydrogen_production_types[hydrogen_type]
+
+	# compute needed amounts of H and the associated costs of H production
+	kg_hydrogen_needed = capacity_kW/(33.6*0.675)
+	h_prod_cost = kg_hydrogen_needed*hydrogen_production['cost ($/kgH)']
+
+	# efficiency of fuel cell tech (varies by capacity size of fuel cells)
+	# maximum theoretical efficiency of fuel cell tech is 83%
+	scenario_efficiency = {}
+	if capacity_kW > 300:
+		scenario_efficiency = {0: 0.50, 1: 0.6, 2: 0.7}
+	else:
+		scenario_efficiency = {0: 0.60, 1: 0.7, 2: 0.8}
+
+	efficiency = scenario_efficiency[scenario]
+	
+	# compute annual and monthly power generation of system
+	annual_generation_kWh = efficiency*capacity_kW*24*365
+	monthly_generation_kWh = [efficiency*capacity_kW*24*30]*12
+
+	# cost calculations where modeled cost of fuel cell system = $40/kW
+	cost = 40*capacity_kW + h_prod_cost
+
+	# area = 
+
+	results = {'hydrogen fuel type': hydrogen_type,'scenario': scenario, 'efficiency (in decimals)': efficiency,
+			"system capacity [kW]": capacity_kW, "system cost $": cost, "annual generation [kWh]": annual_generation_kWh, 
+			"monthly generation [kWh]": monthly_generation_kWh, "area": 0, "energy density [J/m^3]": 1.2*10**11, "GHG emissions (gCO2e/MJ)": hydrogen_production['GHG emissions (gCO2e/MJ)']}
+
+	return results
 
 # EXAMPLES #
 #########################################################################
@@ -364,3 +435,18 @@ def get_geothermal_energy(population, scenario):
 # {'scenario': 0, 'CoP': 3.75, 'system capacity [kW]': 12000.0, 'system cost $': 8571428.571428573, 
 # 'annual generation [kWh]': 105120000.0, 
 # 'monthly generation [kWh]': [8640000.0, 8640000.0, 8640000.0, 8640000.0, 8640000.0, 8640000.0, 8640000.0, 8640000.0, 8640000.0, 8640000.0, 8640000.0, 8640000.0], 'energy density [J/m^3]': 0.05}
+
+#########################################################################
+## EXAMPLE GET_HYDROGEN_ENERGY
+#########################################################################
+
+# hydrogen = get_hydrogen_energy(population=30000, scenario=1, hydrogen_type='grey')
+# print(hydrogen)
+
+###############################
+# OUTPUT GET_HYDROGEN_ENERGY
+# ###############################
+
+# {'hydrogen fuel type': 'grey', 'scenario': 1, 'efficiency (in decimals)': 0.6, 'system capacity [kW]': 90000, 'system cost $': 3607936.507936508, 
+# 'annual generation [kWh]': 473040000.0, 'monthly generation [kWh]': [38880000.0, 38880000.0, 38880000.0, 38880000.0, 38880000.0, 38880000.0, 38880000.0, 38880000.0, 38880000.0, 38880000.0, 38880000.0, 38880000.0], 
+# 'energy density [J/m^3]': 120000000000.0, 'GHG emissions (gCO2e/MJ)': 91.0}
