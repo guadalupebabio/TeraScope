@@ -195,9 +195,7 @@ def get_hydropower(scenario, river_size):
 				- medium river = 5.663 - 22.65 m^3/s = 5663 - 22650 kg/s
 				- mainstem = 22.65 - 70.79 m^3/s = 22650 - 70790 kg/s
 				- large river = 70.79 - 283.2 m^3/s = 70790 -283200 kg/s
-
 	* note: large scale hydropower systems have an efficiency of 90% today, however we are considering the case of small/micro hydropower
-
 	initial approach to hydropower included tracking water resources near informal settlement, however this approach was too complicated for the limited time.
 	future research should include attempting this approach using the water resource data provided by earth engine (this was already started in file hydropower_earthengine.py)
 	
@@ -211,7 +209,6 @@ def get_hydropower(scenario, river_size):
 			medium river = 5.663 - 22.65 m^3/s = 5663 - 22650 kg/s
 			mainstem = 22.65 - 70.79 m^3/s = 22650 - 70790 kg/s
 			large river = 70.79 - 283.2 m^3/s = 70790 -283200 kg/s
-
 	After assumptions are made, the potential energy provided by hypdropower is computed, cost of system, area needed by system, etc. 
 	'''
 	# efficiencies of small/micro hydropower systems = 0 (today), 1 (10+ years), 2 (50 + years)
@@ -254,7 +251,6 @@ def get_geothermal_energy(population, scenario):
 		0 represents the present : CoP = 3.75 
 		1 represents +10 years : CoP = 4.25
 		2 represents +30 years : CoP = 4.75
-
 	Using these two parameters, calculates the necessary capacity, cost, and generation of the 
 	community-scale geothermal heat pump system (GHPS)
 	
@@ -328,10 +324,8 @@ def get_hydrogen_energy(population, scenario, hydrogen_type):
 			- Green: using renenwable energy electricity as a fuel
 		* energy density of hydrogen = 33.6 kWh/kg
 		* electrolysis (electrochemical process used to produce H) has efficiency = 65%-70%
-
 	Once hydrogen is produced, a fuel cell is used to convert hydrogen to electricity through an electrochemical process
 	that combines hydrogen and oxygen, generating electrons and water vapor as a byproduct.
-
 	Important notes:
 		- according to EIA, 70% of household energy consumption is used for heating, cooling, ventillation, etc (HVAC)
 		- according to EIA, average energy consumption per person per year = 305M Btu = 89,387 kWh => 245 kWh/person/day = 10.2 kW/person
