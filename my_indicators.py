@@ -44,6 +44,17 @@ class Energy_related_Indicators(Indicator):
     self.SolarPanelDict = {scenario:get_solar_power(latitude, longitude, cellSize, scenario)["annual_generation_kWh"] for scenario in scenario_set} #this function request the value for PV calling the function #this is how it will look like self.SolarPanelDict   = {0:2500, 1:3000, 3:4000}
     self.current_scenario = scenario_set[0] #choose one scenario
 
+    self.technology_properties_lookup = {
+      'Power_SolarPanel': {
+        'abbreviation': 'SP',
+        'propagation_steps': 1
+      },
+      'Power_NuclearBattery': {
+        'abbreviation': 'NB',
+        'propagation_steps': None
+      }
+    }
+
     '''
     Impact_nuclear_reactor
     '''
@@ -59,16 +70,12 @@ class Energy_related_Indicators(Indicator):
     future_cells = set([])
     geogrid_data_df = geogrid_data.as_df()
 
-    ###### Test, assign all the cells the year 2050
-    geogrid_data_df.loc[geogrid_data_df['id'].isin(time_cells),'name'] = '2050_Year'
-    #######
-
     for i in time_cells:
       if geogrid_data_df.set_index('id').loc[i]['name'] == '2050_Year':
         future_cells.add(i)
 
     if len(future_cells) >= 5: #the majority of the cells are future_cells
-      self.current_scenario = 1 #2050 scenario
+      self.current_scenario = 2 #2050 scenario
       print('The user has set up the 2050 Scenario, welcome to the Future!!')
     else:
       self.current_scenario = 0 #2021 scenario
@@ -87,6 +94,17 @@ class Energy_related_Indicators(Indicator):
     This function calculate the amount of population that have access with a Nuclear Reactor for each scenario
     '''
     return self.NuclearReactorDict / self.Cosumption_Person
+
+  def Access_POB(energy_name):
+    '''
+    Calculate the amount of population that have access with given technology for each scenario
+    '''
+    if energy_name=='Power_SolarPanel':
+      return self.SolarPanel_Access_POB()
+    elif energy_name=='Power_NuclearBattery':
+      return self.NuclearReactor_Access_POB()
+    else:
+      raise NameError('Unknown energy_name')
 
   def load_module(self):
     datframe_bysquare = pd.read_csv('Data/Databysquare.csv')
@@ -108,8 +126,11 @@ class Energy_related_Indicators(Indicator):
 
   def run_simulation(self, geogrid_data):
     self.initialize_simulation(geogrid_data)
-    cells_with_SP_energy,remaining_energy_SP = self.propagate_solar_panel() #execute the function #remaining_energy for another heatmap
-    cells_with_NR_energy,remaining_energy_NR = self.propagate_nuclear_reactor()
+
+    # cells_with_SP_energy,remaining_energy_SP = self.propagate_solar_panel() #execute the function #remaining_energy for another heatmap
+    # cells_with_NR_energy,remaining_energy_NR = self.propagate_nuclear_reactor()
+    cells_with_SP_energy,remaining_energy_SP = self.propagate_technology(energy_name)
+    cells_with_NR_energy,remaining_energy_NR = self.propagate_technology(energy_name,starting_column='POB_WO_ELEC_SP')
 
     self.cells_with['cells_with_SP_energy']      = cells_with_SP_energy [['id','Accesibility_Solar_Panel']]
     self.cells_with['cells_with_SP_autonomy']    = cells_with_SP_energy [['id','Autonomy_Solar_Panel']]
@@ -186,6 +207,52 @@ class Energy_related_Indicators(Indicator):
     self.geogrid_data_df = geogrid_data_df.copy()
     if self.geogrid_data_graph is None:
       self.geogrid_data_graph = geogrid_data.as_graph() #creates a graph
+
+def propagate_technology(self,energy_name,starting_column='POB_WO_ELEC',quietly=False):
+    '''
+    This function takes geogrid_data and identifies the cells with Electricty_SolarPanel. Provides enegy to the column POB_WO_ELEC, first to the cells with a solar panel assigned, and then to its neighbors (using brix function ''neighbors = neighbors|set(geogrid_data_graph.neighbors(i))'').
+    '''
+
+    technology_abbrev = self.technology_properties_lookup[energy_name]['abbreviation']
+    no_iter = self.technology_properties_lookup[energy_name]['propagation_steps']
+    geogrid_data_df = self.geogrid_data_df 
+
+    if len(geogrid_data_df[geogrid_data_df['name']==energy_name])==0:
+      print(f'WARNING: No {energy_name} found')
+    geogrid_data_df.loc[geogrid_data_df['name']==energy_name,f'POB_E_{technology_abbrev}'] = self.Access_POB(energy_name) #assign SolarPanel_Access_POB to all the rows that have solar panels
+    geogrid_data_df[f'POB_E_{technology_abbrev}'] = geogrid_data_df[f'POB_E_{technology_abbrev}'].fillna(0)
+    # First iteration, give energy to those cells that don't have Energy
+    simulated_energy = self.give_energy_cells_neighbors(geogrid_data_df, f'POB_E_{technology_abbrev}', starting_column, no_iter=no_iter)
+    simulated_energy = simulated_energy.rename(columns={
+      'free_energy_out_col': f'POB_E_{technology_abbrev}',
+      'lack_energy_out_col': f'POB_WO_ELEC_{technology_abbrev}',
+      'tech_energy_col':     f'POB_W_ELEC_{technology_abbrev}'
+    })
+    if len(simulated_energy)!=len(geogrid_data_df):
+      raise NameError('give_energy_cells_neighbors() returned a dataframe with different cell number')
+    geogrid_data_df = geogrid_data_df.drop([f'POB_E_{technology_abbrev}',f'POB_WO_ELEC_{technology_abbrev}',f'POB_W_ELEC_{technology_abbrev}'],1,errors='ignore')
+    geogrid_data_df = pd.merge(geogrid_data_df,simulated_energy)
+
+    # Second iteration, if there is spare energy, use it to gain autonomy in the cells
+    if geogrid_data_df[f'POB_E_{technology_abbrev}'].sum() > 0:
+      simulated_energy = self.give_energy_cells_neighbors(geogrid_data_df, f'POB_E_{technology_abbrev}', 'POB_W_ELEC',no_iter=no_iter)
+      simulated_energy = simulated_energy.rename(columns={
+        'free_energy_out_col' : f'POB_E_{technology_abbrev}_AfterAutonomy', #this will be remaining_energy_SP
+        'tech_energy_col'     : f'POB_W_ELEC_{technology_abbrev}_Autonomy' #this contributes to autonomy not energy
+      }).drop('lack_energy_out_col',1)
+      geogrid_data_df = geogrid_data_df.drop([f'POB_E_{technology_abbrev}_AfterAutonomy',f'POB_W_ELEC_{technology_abbrev}_Autonomy'],1,errors='ignore')
+      geogrid_data_df = pd.merge(geogrid_data_df,simulated_energy)
+    else:
+      geogrid_data_df[[f'POB_E_{technology_abbrev}_AfterAutonomy',f'POB_W_ELEC_{technology_abbrev}_Autonomy']]=0
+
+    geogrid_data_df[f'Accesibility_{energy_name}'] = geogrid_data_df[f'POB_W_ELEC_{technology_abbrev}']/geogrid_data_df['POBTOT'] #percentage of people in that cell that recieve energy from a solar panel
+    geogrid_data_df[f'Accesibility_{energy_name}'] = geogrid_data_df[f'Accesibility_{energy_name}'].fillna(0)
+    geogrid_data_df[f'Autonomy_{energy_name}'] = geogrid_data_df[f'POB_W_ELEC_{technology_abbrev}_Autonomy']/geogrid_data_df['POBTOT'] #percentage of people in that cell that recieve energy from a solar panel
+    geogrid_data_df[f'Autonomy_{energy_name}'] = geogrid_data_df[f'Autonomy_{energy_name}'].fillna(0)
+    remaining_energy = geogrid_data_df[f'POB_E_{energy_name}_AfterAutonomy'].sum() 
+    out_df = geogrid_data_df[['id',f'Accesibility_{technology_abbrev}', f'Autonomy_{technology_abbrev}']] #reduce the output of the funcion to two columns
+    self.geogrid_data_df = geogrid_data_df.copy()
+    return out_df ,remaining_energy
 
   def propagate_solar_panel(self,energy_name='Power_SolarPanel',quietly=False):
     '''
