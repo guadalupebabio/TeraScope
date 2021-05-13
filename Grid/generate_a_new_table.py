@@ -39,7 +39,7 @@ if brix.is_table(table_name) == True:
   print(f'This table already exists, you can see it here: https://cityscope.media.mit.edu/CS_cityscopeJS/?cityscope={table_name}')
   new_table = input(f'Do you still want to create the table: {table_name}? (y/n)').lower() 
 
-elif  brix.is_table(table_name) == False or new_table == 'y': 
+if  brix.is_table(table_name) == False or new_table == 'y': 
 
   ## MAKE API CALL TO MONGO DB ##
   settlement_data = get_mongo(name)
@@ -48,7 +48,6 @@ elif  brix.is_table(table_name) == False or new_table == 'y':
   corner_bbox = settlement_polygon.bounds #lower left corner and upper right corner
   
   ## DEFINE PARAMETS OF THE GRID ##
-  #table_name inputed when running this script
   top_left_lat = corner_bbox[3] ## #42.3664655 
   top_left_lon = corner_bbox[0] ## #-71.0854323
   top_left = (top_left_lat,top_left_lon)
@@ -112,6 +111,8 @@ elif  brix.is_table(table_name) == False or new_table == 'y':
   ## CHANGE OPACITY ## #not working
   H = Handler(table_name)
   H.set_opacity({'Street_NoInteractive':0}, default_alpha = 0.7)
+
+  H.reset_geogrid_data()
 
   ## SAVE THE NEW GRID##
   geogrid_out_fname = 'grid_'+ table_name +'.json'
