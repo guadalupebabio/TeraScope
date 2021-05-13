@@ -24,10 +24,12 @@ default_type = 'No_Technology'
 timing_now_type = '2021'
 timing_future_type = '2025'
 new_types=json.load(open('type_definitions/lomas_types.json'))
-print(new_types)
 
-default_color_hex = new_types[default_type]['color'].lstrip('#')
-default_color_rgb = list(int(default_color_hex[i:i+2], 16) for i in (0, 2, 4)) #doesn't work
+for i in new_types:
+  default_color_hex = new_types[i]['color'].lstrip('#')
+  default_color_rgb = list(int(default_color_hex[i:i+2], 16) for i in (0, 2, 4))
+  default_color_rgb.append(200)
+  new_types[i]['color'] = default_color_rgb
 
 #Assign the property 'Street_NoInteractive' to those cells outside the polygon
 geogrid = H.get_GEOGRID()
@@ -42,12 +44,10 @@ for cell in geogrid['features']:
       cell['properties']['color'] = [0,0,0,0]
       cell['properties'].pop('interactive',None)
     else: #time_cells
-      cell['properties']['name']= default_type #timing_now_type
-      cell['properties']['color'] = default_color_hex
+      cell['properties']['name']= timing_now_type
       cell['properties']['interactive'] = 'Web'
   else:
     cell['properties']['name'] = default_type
-    cell['properties']['color'] = default_color_hex
     cell['properties']['interactive'] = 'Web'
 
 # Save the geogrid created
