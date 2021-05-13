@@ -25,6 +25,7 @@ timing_now_type = '2021'
 timing_future_type = '2025'
 new_types=json.load(open('type_definitions/lomas_types.json'))
 
+## CHANGE OPACITY OF TYPES IN THE RGB ##
 for i in new_types:
   default_color_hex = new_types[i]['color'].lstrip('#')
   default_color_rgb = list(int(default_color_hex[i:i+2], 16) for i in (0, 2, 4))
