@@ -184,7 +184,7 @@ class Energy_related_Indicators(Indicator):
     return radar
 
   def return_indicator_textual(self,geogrid_data):
-    if self.current_scenario == 1:
+    if self.current_scenario == 2:
       scenario_txt = '2050 scenario'
     else:
       scenario_txt = '2021 scenario'
