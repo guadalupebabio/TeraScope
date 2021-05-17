@@ -1,5 +1,5 @@
 geopandas==0.9.0
-git+git://github.com/CityScope/CS_Brix@master#egg=CS_Brix
+-e git://github.com/CityScope/CS_Brix.git@grid_maker#egg=cs_brix
 pygeos==0.9
 Rtree==0.9.7
 folium==0.12.1
