@@ -1,11 +1,7 @@
-geopandas==0.9.0
 -e git://github.com/CityScope/CS_Brix.git@grid_maker#egg=cs_brix
 pygeos==0.9
 Rtree==0.9.7
 folium==0.12.1
-pandas==1.2.3
 fiona>=1.8
-#json ERROR: Could not find a version that satisfies the requirement json
-requests==2.25.1
-matplotlib == 3.4.1
-vincenty == 0.1.4
+matplotlib==3.4.1
+vincenty==0.1.4
