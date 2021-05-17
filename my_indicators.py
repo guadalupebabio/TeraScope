@@ -13,20 +13,22 @@ import pandas as pd
 import numpy as np
 import json
 from brix import Indicator
-from Technologies.power import get_solar_power, get_nuclear_energy #import a function from the file Power_Technologies
+from Technologies.power import get_solar_power, get_nuclear_energy, get_hydropower, get_geothermal_energy, get_hydrogen_energy #import a function from the file Power_Technologies
 pd.options.mode.chained_assignment = None
 
 class Energy_related_Indicators(Indicator):
   '''
   This function comprises any heatmap or indicator related with Energy
   '''
-  def setup(self,cellSize=20,latitude=20.770724,longitude=-103.371491,scenario_set=['default']):
+  def setup(self,cellSize=20,latitude=20.770724,longitude=-103.371491,poopulation = 5000,scenario_set=['default']):
     '''
-    Common to allsi
+    Common to all si
     '''
     self.requires_geometry = True
     self.datframe_bysquare = None
     self.wgs84 = 'EPSG:4326'
+
+    #poopulation = 5000 #get it from datframe_bysquare
 
     self.indicator_type = 'hybrid'    
 
@@ -61,6 +63,11 @@ class Energy_related_Indicators(Indicator):
     self.NuclearReactorDict = get_nuclear_energy(cellSize,scenario_set)["max_annual_generation_kWh"] #this function request the value for PV calling the function #this is how it will look like self.SolarPanelDict   = {0:2500, 1:3000, 3:4000}
     self.cells_with = {} #Create a dictionary
     self.remaining_energy = {} #Create a dictionary
+
+    '''
+    Impact_geothermal
+    '''
+    self.GeothermalDict = {scenario:get_geothermal_energy(poopulation, scenario)["annual_generation_kWh"] for scenario in scenario_set} #this function request the value for PV calling the function #this is how it will look like self.SolarPanelDict   = {0:2500, 1:3000, 3:4000}
     
   def set_current_scenario(self,geogrid_data):
     '''
@@ -95,11 +102,16 @@ class Energy_related_Indicators(Indicator):
     '''
     return self.NuclearReactorDict / self.Cosumption_Person
 
-  def Access_POB(energy_name):
+  def get_geothermal_energy(self):
+    '''
+    This function calculate the amount of population that have access with a Nuclear Reactor for each scenario
+    '''
+    return self.GeothermalDict / self.Cosumption_Person
+
+  def Access_POB(self,energy_name):
     '''
     Calculate the amount of population that have access with given technology for each scenario
     '''
-    print('works')
     if energy_name=='Power_SolarPanel':
       return self.SolarPanel_Access_POB()
     elif energy_name=='Power_NuclearBattery':
@@ -117,7 +129,6 @@ class Energy_related_Indicators(Indicator):
 
     # intermediate calculations common to all indicators
     self.calculate_EnergyAccess() 
-    
     # make indicators
     out = {}
     out['heatmap'] = self.return_indicator_heatmap(geogrid_data)
@@ -133,8 +144,8 @@ class Energy_related_Indicators(Indicator):
     cells_with_SP_energy,remaining_energy_SP = self.propagate_technology('Power_SolarPanel')
     cells_with_NR_energy,remaining_energy_NR = self.propagate_technology('Power_NuclearBattery',starting_column='POB_WO_ELEC_SP')
 
-    self.cells_with['cells_with_SP_energy']      = cells_with_SP_energy [['id','Accesibility_Solar_Panel']]
-    self.cells_with['cells_with_SP_autonomy']    = cells_with_SP_energy [['id','Autonomy_Solar_Panel']]
+    self.cells_with['cells_with_SP_energy']      = cells_with_SP_energy [['id','Accesibility_Power_SolarPanel']]
+    self.cells_with['cells_with_SP_autonomy']    = cells_with_SP_energy [['id','Autonomy_Power_SolarPanel']]
     self.cells_with['cells_with_NR_energy']      = cells_with_NR_energy
     self.remaining_energy['remaining_energy_SP'] = remaining_energy_SP
     self.remaining_energy['remaining_energy_NR'] = remaining_energy_NR
@@ -155,7 +166,8 @@ class Energy_related_Indicators(Indicator):
     heatmap = pd.merge(heatmap,energy_access)
 
     # Select relevant collumns
-    heatmap = heatmap[['Accesibility_Solar_Panel','Accesibility_nuclear_reactor','Access_to_Energy','geometry']]
+    heatmap = heatmap[['Accesibility_Power_SolarPanel','Accesibility_Power_NuclearBattery','Access_to_Energy','geometry']]
+    #rename heatmap = heatmap.rename(dict)
     print('Heatmap works!')
     # Convert to json and export
     heatmap = json.loads(heatmap.to_json())
@@ -166,7 +178,7 @@ class Energy_related_Indicators(Indicator):
       {'name': 'Social Wellbeing', 'value': 0.3, 'viz_type': 'radar'}, # WIP
       {'name': 'Environmental Impact', 'value': 0.1, 'viz_type': 'radar'}, #WIP
       {'name': 'Access to Energy', 'value': self.geogrid_data_df['Access_to_Energy'].sum()/len(self.geogrid_data_df['Access_to_Energy']), 'viz_type': 'radar'},
-      {'name': 'Autonomy', 'value': (self.geogrid_data_df['POB_W_ELEC_NR'].sum() + self.geogrid_data_df['POB_W_ELEC_SP'].sum() + self.geogrid_data_df['POB_W_ELEC_SP_Autonomy'].sum())/self.geogrid_data_df['POBTOT'].sum(), 'viz_type': 'radar'} 
+      {'name': 'Autonomy', 'value': (self.geogrid_data_df['POB_W_ELEC_NB'].sum() + self.geogrid_data_df['POB_W_ELEC_SP'].sum() + self.geogrid_data_df['POB_W_ELEC_SP_Autonomy'].sum())/self.geogrid_data_df['POBTOT'].sum(), 'viz_type': 'radar'} 
     ]
     print('Radar works!')
     return radar
@@ -193,7 +205,7 @@ class Energy_related_Indicators(Indicator):
     geogrid_data_df = self.geogrid_data_df.copy() #working on a local copy
     geogrid_data_df['POB_W_ELEC_percentage'] = geogrid_data_df['POB_W_ELEC']/geogrid_data_df['POBTOT']
     geogrid_data_df['POB_W_ELEC_percentage'] = geogrid_data_df['POB_W_ELEC_percentage'].fillna(0)
-    geogrid_data_df['Access_to_Energy'] = geogrid_data_df['POB_W_ELEC_percentage'] + geogrid_data_df['Accesibility_Solar_Panel'] + geogrid_data_df['Accesibility_nuclear_reactor']
+    geogrid_data_df['Access_to_Energy'] = geogrid_data_df['POB_W_ELEC_percentage'] + geogrid_data_df['Accesibility_Power_SolarPanel'] + geogrid_data_df['Accesibility_Power_NuclearBattery']
     geogrid_data_df['Access_to_Energy'] = geogrid_data_df['Access_to_Energy'].fillna(0) 
 
     out_AE_df = geogrid_data_df[['id','Access_to_Energy']]
@@ -250,8 +262,8 @@ class Energy_related_Indicators(Indicator):
     geogrid_data_df[f'Accesibility_{energy_name}'] = geogrid_data_df[f'Accesibility_{energy_name}'].fillna(0)
     geogrid_data_df[f'Autonomy_{energy_name}'] = geogrid_data_df[f'POB_W_ELEC_{technology_abbrev}_Autonomy']/geogrid_data_df['POBTOT'] #percentage of people in that cell that recieve energy from a solar panel
     geogrid_data_df[f'Autonomy_{energy_name}'] = geogrid_data_df[f'Autonomy_{energy_name}'].fillna(0)
-    remaining_energy = geogrid_data_df[f'POB_E_{energy_name}_AfterAutonomy'].sum() 
-    out_df = geogrid_data_df[['id',f'Accesibility_{technology_abbrev}', f'Autonomy_{technology_abbrev}']] #reduce the output of the funcion to two columns
+    remaining_energy = geogrid_data_df[f'POB_E_{technology_abbrev}_AfterAutonomy'].sum() 
+    out_df = geogrid_data_df[['id',f'Accesibility_{energy_name}', f'Autonomy_{energy_name}']] #reduce the output of the funcion to two columns
     self.geogrid_data_df = geogrid_data_df.copy()
     return out_df ,remaining_energy
 

@@ -21,8 +21,8 @@ lon_point_list = [-103.36270688388338,-103.36274981993364,-103.3615690785509,-10
 polygon_geom = Polygon(zip(lon_point_list, lat_point_list))
 
 default_type = 'No_Technology'
-timing_now_type = '2021'
-timing_future_type = '2025'
+timing_now_type = '2021_Year'
+timing_future_type = '2025_Year'
 new_types=json.load(open('type_definitions/lomas_types.json'))
 
 ## CHANGE OPACITY OF TYPES IN THE RGB ##

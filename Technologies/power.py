@@ -263,49 +263,43 @@ def get_geothermal_energy(population, scenario):
 	# calculate the needed capacity of the GHPS in kW
 	consumption = 3*population
 	scenario_coeff_performance = {0: 3.75, 1: 4.25, 2: 4.75}
-
-	def geothermal_CoP(CoP):
-		capacity = 0.5*consumption/CoP
-
-		# pipe_network represents the length of pipes that connect from central system to houses in meters 
-		# see Energy Tech document for details on assumptions of pipe lenght
-		pipe_network = 0
-		if population <= 300:
-			pipe_network = 750
-
-		elif population <= 750:
-			pipe_network = 1500
-
-		elif population <= 1500:
-			pipe_network = 2250
-
-		elif population < 3000:
-			pipe_network = 3000
-
-		else:
-			pipe_network = population
-
-		# Cost GHP for a community development = $2,500/ton = $2,500/3.5 kW
-		# multiply times capacity [kW] = $
-		cost = 2500/3.5*capacity 
-		
-		annual_generation_kWh = capacity*24*365
-		monthly_generation_kWh = [capacity*24*30]*12
-
-		energy_density = 0.05
-
-		results = {"CoP": CoP, "system capacity [kW]": capacity, "system cost $": cost, "annual generation [kWh]": annual_generation_kWh, 
-				"monthly generation [kWh]": monthly_generation_kWh, "energy density [J/m^3]": 0.05, "GHG emissions (gCO2e/MJ)": 25}
-
-		return results
-
 	CoP = scenario_coeff_performance[scenario]
-	scenario_results = {"scenario" : scenario}
-	geo_results = geothermal_CoP(CoP)
-	
-	scenario_results.update(geo_results)
 
-	return scenario_results
+	capacity = 0.5*consumption/CoP
+
+	# pipe_network represents the length of pipes that connect from central system to houses in meters 
+	# see Energy Tech document for details on assumptions of pipe lenght
+	pipe_network = 0
+	if population <= 300:
+		pipe_network = 750
+
+	elif population <= 750:
+		pipe_network = 1500
+
+	elif population <= 1500:
+		pipe_network = 2250
+
+	elif population < 3000:
+		pipe_network = 3000
+
+	else:
+		pipe_network = population
+
+	# Cost GHP for a community development = $2,500/ton = $2,500/3.5 kW
+	# multiply times capacity [kW] = $
+	cost = 2500/3.5*capacity 
+	
+	annual_generation_kWh = capacity*24*365
+	monthly_generation_kWh = [capacity*24*30]*12
+
+	energy_density = 0.05
+
+	results = {"CoP": CoP, "system capacity [kW]": capacity, "system cost $": cost, "annual_generation_kWh": annual_generation_kWh, 
+			"monthly_generation_kWh": monthly_generation_kWh, "energy density [J/m^3]": 0.05, "GHG emissions (gCO2e/MJ)": 25}
+
+	return results
+
+
 
 # HYDROGEN TECHNOLOGY
 def get_hydrogen_energy(population, scenario, hydrogen_type):
