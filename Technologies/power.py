@@ -136,12 +136,9 @@ def get_solar_power(latitude, longitude, cellSize, scenario): #before get_solar_
 		scenario_annual_pv_gen = round((pv_watts_data["outputs"]["ac_annual"]/current_eff)*future50_eff,2)
 		scenario_monthly_pv_gen = [round((i/current_eff)*future50_eff,2) for i in pv_watts_data["outputs"]["ac_monthly"]]
 
-	results = {
-		"system_capacity_kW":sys_cap, "latitude": latitude, "longitude": longitude, "scenario": scenario, 
+	results = {"system_capacity_kW":sys_cap, "latitude": latitude, "longitude": longitude, "scenario": scenario, 
 		"annual_generation_kWh": scenario_annual_pv_gen, "monthly_generation_kWh": scenario_monthly_pv_gen,
 		'energy density [J/m^3]': 0.0000015, 'GHG emissions (gCO2e/MJ)': 11.4}
-	# results = {"annual_generation_kWh": scenario_annual_pv_gen} #cell, 20m2. We put 6 panels with 550 kW/h of energy per year from each panel on your roof
-	# print(f'results:{results}')
 	return results
 
 
@@ -182,7 +179,7 @@ def get_nuclear_energy(cellSize, scenario):
 	return results
 
 # HYDROPOWER TECHNOLOGY
-def get_hydropower(scenario, river_size):
+def get_hydropower(scenario, river_size = 'small'):
 	'''
 	param scenario : int [0, 1, 2] : Timeline, this will change the efficiencies according to the predictions for small/micro hydropower systems
 		0 represents the present : efficiency = 70%
@@ -238,9 +235,8 @@ def get_hydropower(scenario, river_size):
 		cost = (1000 + 5*capacity_kW)*capacity_kW
 
 	results = {'scenario': scenario, 'efficiency (in decimals)': efficiency, 'river size': river_size, 'river discharge (kg/s)': flow_rate,
-			"system capacity [kW]": capacity_kW, "system cost $": cost, "annual generation [kWh]": annual_generation_kWh, 
+			"system capacity [kW]": capacity_kW, "system cost $": cost, "annual_generation_kWh": annual_generation_kWh, 
 			"monthly generation [kWh]": monthly_generation_kWh, "energy density [J/m^3]": 7*10**5, "GHG emissions (gCO2e/MJ)": 5.14}
-
 	return results
 
 # GEOTHERMAL TECHNOLOGY
@@ -302,7 +298,7 @@ def get_geothermal_energy(population, scenario):
 
 
 # HYDROGEN TECHNOLOGY
-def get_hydrogen_energy(population, scenario, hydrogen_type):
+def get_hydrogen_energy(population, scenario, hydrogen_type = 'green'):
 	'''
 	param population : type int : population of informal settlement
 	param area : type double : area of informal settlement
@@ -361,7 +357,7 @@ def get_hydrogen_energy(population, scenario, hydrogen_type):
 	# area = 
 
 	results = {'hydrogen fuel type': hydrogen_type,'scenario': scenario, 'efficiency (in decimals)': efficiency,
-			"system capacity [kW]": capacity_kW, "system cost $": cost, "annual generation [kWh]": annual_generation_kWh, 
+			"system capacity [kW]": capacity_kW, "system cost $": cost, "annual_generation_kWh": annual_generation_kWh, 
 			"monthly generation [kWh]": monthly_generation_kWh, "area": 0, "energy density [J/m^3]": 1.2*10**11, "GHG emissions (gCO2e/MJ)": hydrogen_production['GHG emissions (gCO2e/MJ)']}
 
 	return results
