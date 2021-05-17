@@ -1,4 +1,2 @@
-Cython>=0.29.23
-pyproj==1.9.6
 -e git://github.com/CityScope/CS_Brix.git@grid_maker#egg=cs_brix
 vincenty==0.1.4
