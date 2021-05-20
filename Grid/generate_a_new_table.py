@@ -17,7 +17,7 @@ import pymongo
 from pprint import pprint
 
 from brix import Handler
-from brix import Grid, edit_types, commit_grid, normalize_table_name
+from brix import Grid, normalize_table_name
 from shapely.geometry.polygon import Polygon
 from shapely.geometry import shape
 from vincenty import vincenty
@@ -79,14 +79,14 @@ if  brix.is_table(table_name) == False or new_table == 'y':
   crs_epsg = '26917' # the previous one: 4326
 
   ## CREATE GEOGRID ##
-  new_grid = Grid(table_name,top_left_lon, top_left_lat, rotation, cell_size, nrows, ncols)
+  new_grid = Grid(table_name, top_left_lat, top_left_lon, rotation=rotation, cell_size=cell_size, nrows=nrows, ncols=ncols)
   grid_geo = new_grid.get_grid_geojson() 
   print('GEOGRID works')
 
   ## EDIT TYPES ##
   types_location = 'type_definitions/lomas_types.json'
   new_types=json.load(open(types_location)) #loads the json with the types
-  edit_types(grid_geo, new_types)
+  new_grid.edit_types(new_types)
   print('EDIT TYPES works')
 
   ## SET INTERACTIVE AREAS ##
@@ -105,7 +105,7 @@ if  brix.is_table(table_name) == False or new_table == 'y':
       cell['properties']['interactive'] = 'Web'
 
   ## POST GRID TO CITY IO ##
-  commit_grid(table_name,grid_geo)
+  new_grid.commit_grid()
   print('POST GRID works')
 
   ## CHANGE OPACITY ## #not working
