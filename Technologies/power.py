@@ -107,7 +107,10 @@ def get_solar_power(latitude, longitude, cellSize, scenario): #before get_solar_
 	# panel type = 210 W/m^2
 	# divide by 1000 to convert to kW
 	sys_cap = cellSize*0.5*210/1000 
-
+	
+	# use 50% of cellsize of informal settlements - in the form of rooftops, open land, etc.
+	area =  cellszie*0.5
+	
 	# pv watts data of roof mounted system
 	pv_watts_data = dict(pv_watts_get(sys_cap, float(latitude), float(longitude), array_type=1))
 	if pv_watts_data['errors']:
@@ -138,7 +141,7 @@ def get_solar_power(latitude, longitude, cellSize, scenario): #before get_solar_
 
 	results = {"system_capacity_kW":sys_cap, "latitude": latitude, "longitude": longitude, "scenario": scenario, 
 		"annual_generation_kWh": scenario_annual_pv_gen, "monthly_generation_kWh": scenario_monthly_pv_gen,
-		'energy density [J/m^3]': 0.0000015, 'GHG emissions (gCO2e/MJ)': 11.4}
+		'energy density [J/m^3]': 0.0000015, 'GHG emissions (gCO2e/MJ)': 11.4, "area (m^2)": area}
 	return results
 
 
@@ -152,10 +155,10 @@ def get_nuclear_energy(cellSize, scenario):
 		https://anpeg.mit.edu/about
 	paramters:
 		cellSize : float : area of covered by each cell in terascope tool (m^2)
-			- this technology is not dependant upon area, however requires a minimum space of 231.886 m^2 (eq. to 2496 ft^2 = 0.06 acre) -> round to 235 m^2
+			- this technology is not dependant upon area, however requires a minimum space of 245 m^2 (eq. to 2496 ft^2 = 0.06 acre)
 	returns:
 		dictionary including : "max_system_capacity_kWh", "annual_generation_kWh", "monthly_generation_kWh"
-			- one eVinci micro NR produces between 200 kWe and 500 MWe, meaning 200 kWh - 500,000 kWh
+			- one eVinci micro NR produces between 200 kWe and 5 MWe, meaning 200 kWh - 5,000 kWh
 	'''
 
 	if cellSize < 0: #original: # if cellSize < 235: #REVIEW THIS!
@@ -163,18 +166,21 @@ def get_nuclear_energy(cellSize, scenario):
 
 	else:
 		min_system_capacity_kWh = 200
-		max_system_capacity_kWh = 500000
+		max_system_capacity_kWh = 5000
 
 		min_annual_generation_kWh = 200*24*365
-		max_annual_generation_kWh = 500000*24*365
+		max_annual_generation_kWh = 5000*24*365
 
 		min_monthly_generation_kWh = [200*24*30]*12 #this should be divided no?
-		max_monthly_generation_kWh = [500000*24*30]*12
+		max_monthly_generation_kWh = [5000*24*30]*12
+		
+		# space (m^2) of e-vinci micro reactor
+		area = 245 
 
 		results = {"min_system_capacity_kWh": min_system_capacity_kWh, "max_system_capacity_kWh": max_system_capacity_kWh, 
 			"min_annual_generation_kWh": min_annual_generation_kWh, "max_annual_generation_kWh": max_annual_generation_kWh, 
 			"min_monthly_generation_kWh": min_monthly_generation_kWh, "max_monthly_generation_kWh": max_monthly_generation_kWh,
-			"energy density [J/m^3]": 2.2*10**17, "GHG emissions (gCO2e/MJ)": 3.33}
+			"energy density [J/m^3]": 2.2*10**17, "GHG emissions (gCO2e/MJ)": 3.33, "area (m^2)": area}
 
 	return results
 
@@ -289,9 +295,13 @@ def get_geothermal_energy(population, scenario):
 	monthly_generation_kWh = [capacity*24*30]*12
 
 	energy_density = 0.05
+	
+	# approximately 1-8 acres of land use per MW for geothermal plants, assumption: this plant would be much smaller than geothermal plants as it is a large heat pump system
+	# 2 acres =~ 8100 m^2, capacity in MW = capacity / 1000
+	area = 8100*1000/capacity
 
 	results = {"CoP": CoP, "system capacity [kW]": capacity, "system cost $": cost, "annual_generation_kWh": annual_generation_kWh, 
-			"monthly_generation_kWh": monthly_generation_kWh, "energy density [J/m^3]": 0.05, "GHG emissions (gCO2e/MJ)": 25}
+			"monthly_generation_kWh": monthly_generation_kWh, "energy density [J/m^3]": 0.05, "GHG emissions (gCO2e/MJ)": 25, "area (m^2)": area}
 
 	return results
 
