@@ -17,7 +17,7 @@ import pymongo
 from pprint import pprint
 
 from brix import Handler
-from brix import Grid, normalize_table_name
+from brix import Grid_maker, normalize_table_name
 from shapely.geometry.polygon import Polygon
 from shapely.geometry import shape
 from vincenty import vincenty
@@ -29,7 +29,7 @@ from Data import get_mongo, coordinates_to_polygon #function that get data from 
 
 #from Data.api_mongoDB import get_mongo, coordinates_to_polygon #function that get data from Mongo DB
 
-name = 'Imbaba, Cairo' #'Lomas del Centinela, Zapopan'
+name = 'Lomas del Centinela, Zapopan' #'Lomas del Centinela, Zapopan'
 # table_name = input('What is the name of the table you want ot create? (copy paste the same name as appears in the map of informality)')
 table_name = brix.normalize_table_name(name)
 print(f'table_name:{table_name}')
@@ -79,7 +79,7 @@ if  brix.is_table(table_name) == False or new_table == 'y':
   crs_epsg = '26917' # the previous one: 4326
 
   ## CREATE GEOGRID ##
-  new_grid = Grid(table_name, top_left_lat, top_left_lon, rotation=rotation, cell_size=cell_size, nrows=nrows, ncols=ncols)
+  new_grid = Grid_maker(table_name, top_left_lat, top_left_lon, rotation=rotation, cell_size=cell_size, nrows=nrows, ncols=ncols)
   grid_geo = new_grid.get_grid_geojson() 
   print('GEOGRID works')
 

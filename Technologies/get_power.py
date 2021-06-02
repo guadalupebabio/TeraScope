@@ -31,8 +31,8 @@ def get_technologies_values(cellSize=20,latitude=20.770724,longitude=-103.371491
 
 sp, nb, hp, gt, hg = get_technologies_values()
 
-print(f'solar panel: {sp}')
+# print(f'solar panel: {sp}')
 # print(f'Nuclear reactor: {nb}')
 # print(f'Hydropower: {hp}')
 # print(f'Geothermal: {gt}')
-# print(f'Hydrogen: {hg}')
+print(f'Hydrogen: {hg}')

@@ -109,7 +109,7 @@ def get_solar_power(latitude, longitude, cellSize, scenario): #before get_solar_
 	sys_cap = cellSize*0.5*210/1000 
 	
 	# use 50% of cellsize of informal settlements - in the form of rooftops, open land, etc.
-	area =  cellszie*0.5
+	area =  cellSize*0.5
 	
 	# pv watts data of roof mounted system
 	pv_watts_data = dict(pv_watts_get(sys_cap, float(latitude), float(longitude), array_type=1))

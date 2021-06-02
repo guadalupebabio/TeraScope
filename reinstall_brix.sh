@@ -4,6 +4,6 @@ pip uninstall cs-brix
 # To install a commit: pip install git+git://github.com/CityScope/CS_Brix.git@319b135b71aba18708e30b776e5b132ad959cb1c
 #
 # To install a branch: 
-pip install -e git://github.com/CityScope/CS_Brix.git@grid_maker_c#egg=cs_brix
+pip install -e git://github.com/CityScope/CS_Brix.git@master#egg=cs_brix
 #
 # This script integrates the indicators and any modification of the grid
