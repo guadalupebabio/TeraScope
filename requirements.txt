@@ -1,2 +1,2 @@
-cs-brix>=0.0.10
+cs_brix>=0.0.10
 vincenty==0.1.4
