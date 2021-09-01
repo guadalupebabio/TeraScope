@@ -9,5 +9,5 @@ https://github.com/CityScope
 
 ## Run it locally
 - Clone the repository
-- Make sure you have pip installed
-- paste in terminal: $ pip install `-r requirements.txt`, this installs the requirements needed.
+- Make sure you have pip installed `pip3 -V` the number depends on your version of python.
+- paste in terminal: $ `pip3 install -r requirements.txt`, this installs the requirements needed.
