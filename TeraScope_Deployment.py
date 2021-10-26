@@ -1,7 +1,3 @@
-# type on terminal: source ~/myEnvs/tera/bin/activate
-#
-# Desinstall and install Brix: Bash reinstall_brix.sh
-#
 # This script integrates the indicators and any modification of the grid
 # 
 

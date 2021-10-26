@@ -245,7 +245,7 @@ class Energy_related_Indicators(Indicator):
       'info': scenario_txt
     },{
       'id': 9249,
-      'info': "This technology has increased the autonomy of Lomas"
+      'info': ""
     }]
     print('Textual works!')
     return textual

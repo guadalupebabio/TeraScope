@@ -4,7 +4,7 @@
 
 from power import get_solar_power, get_nuclear_energy, get_hydropower, get_geothermal_energy, get_hydrogen_energy #import functions from the file Power_Technologies
 
-def get_technologies_values(cellSize=20,latitude=20.770724,longitude=-103.371491,poopulation = 5000):
+def get_technologies_values(cellSize=20,latitude=20.65,longitude=-103.26,poopulation = 5000):
 
     wgs84 = 'EPSG:4326'
     
@@ -29,10 +29,19 @@ def get_technologies_values(cellSize=20,latitude=20.770724,longitude=-103.371491
 
     return SolarPanelDict, NuclearBatteryDict, HydropowerDict, GeothermalDict, HydrogenDict
 
+
+#########################################################################
+## EXAMPLE GET_TECHNOLOGIES_VALUES
+#########################################################################
+# energy_values = get_technologies_values()
+# print(energy_values)
+
 sp, nb, hp, gt, hg = get_technologies_values()
 
 # print(f'solar panel: {sp}')
 # print(f'Nuclear reactor: {nb}')
 # print(f'Hydropower: {hp}')
 # print(f'Geothermal: {gt}')
-print(f'Hydrogen: {hg}')
+# print(f'Hydrogen: {hg}')
+
+

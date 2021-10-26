@@ -4,6 +4,10 @@
 #if it doesn't run try with the colab: https://colab.research.google.com/drive/1W81SI2i92brySznKS8_iEZBggr76BW1w?usp=sharing
 # 
 #error http://cityio.media.mit.edu/api/table/lomas/GEOGRID/properties/types are not updated!
+#Input :  table_name (make sure is an existing table)
+# 
+#Output : new table https://cityscope.media.mit.edu/CS_cityscopeJS/?cityscope=table_name
+#
 
 import json
 import requests

@@ -1,0 +1,159 @@
+{
+    "geolocation": {
+    "coordinates": [
+        20.764781341419358,
+        -103.36270688388338,
+        20.76303528674933,
+        -103.36274981993364,
+        20.763215914030038,
+        -103.3615690785509,
+        20.762031797925214,
+        -103.36227752338053,
+        20.76134942171894,
+        -103.36176229077716,
+        20.76124907201699,
+        -103.36077476162069,
+        20.761430386498358,
+        -103.35710590345617,
+        20.75675402210621,
+        -103.35873747336686,
+        20.756071622073794,
+        -103.35841545298975,
+        20.75657338710328,
+        -103.36019729907642,
+        20.756891146354917,
+        -103.36146340784991,
+        20.75557076509179,
+        -103.36176355384579,
+        20.757716955908744,
+        -103.36681530234735,
+        20.758852159932292,
+        -103.36631873727687,
+        20.7593438806329,
+        -103.36723112834531,
+        20.761691654649997,
+        -103.36669703771352,
+        20.76670887497622,
+        -103.37101723758293,
+        20.769215940307845,
+        -103.36673933187646,
+        20.769356147330143,
+        -103.36523770894898,
+        20.770700755657085,
+        -103.36399256349084,
+        20.771041923030506,
+        -103.36373494718914,
+        20.76811216984444,
+        -103.3603015332957,
+        20.765182062242182,
+        -103.36216925148294
+    ],
+    "type": "polygon",
+    "area": 1.16
+    },
+    "site": {
+        "origin": {
+            "causes": [
+                "Illegal Subdivision",
+                ""
+            ],
+            "population": 5389
+        },
+        "geography": {
+            "topography": [
+                "Mountain",
+                ""
+            ],
+            "withinCities": [
+                "Squatting on the fringe",
+                ""
+            ],
+            "type_of_climate": [
+                "C",
+                ""
+            ]
+        },
+        "vulnerability": {
+            "resilienceToNaturalConditions": "84",
+            "crimeRate": "85",
+            "perceptionOfInsecurity": "87",
+            "communityEngagement": "33"
+        }
+    },
+    "architecture": {
+        "physicalNature": {
+            "houseQuality": "2",
+            "materials": [
+                "Brick",
+                ""
+            ],
+            "developmentState": "9"
+        },
+        "infrastructure": {
+            "accessToEnergy": "4",
+            "sourceOfEnergy": [
+                "Electricity",
+                ""
+            ],
+            "accessToWater": [
+                "0",
+                "67"
+            ],
+            "accessToSanitation": [
+                "12",
+                "27"
+            ],
+            "accessToPhoneFare": "7",
+            "accessToInternet": "7",
+            "physicalStateOfStreets": "0",
+            "mobilitySystems": [
+                "By Public Transport",
+                ""
+            ]
+        },
+        "density": {
+            "elevation": "2",
+            "householdPerHouseSize": "16",
+            "dwellingSize": "",
+            "ratio": 4645
+        }
+    },
+    "name": "Lomas del Centinela, Zapopan",
+    "email": "arago78@hotmail.com",
+    "__v": 0,
+    "populace": {
+        "qualityOfLife": {
+            "happiness": "90",
+            "food": "90",
+            "proximity": "100",
+            "AccesstoNaturalsettings": "100",
+            "accessToHealthCare": "0",
+            "numberOfHealthCareFacilities": "100"
+        },
+        "economy": {
+            "unemploymentRate": 83,
+            "formalEmployment": "5",
+            "populationIncome": "10",
+            "tenure": "7"
+        },
+        "demography": {
+            "gender": "51",
+            "ethinicIdentities": "",
+            "ageGroups": {
+                "0-5years": 11,
+                "19-30years": 12,
+                "6-12years": 24,
+                "31-50years": 23,
+                "13-18years": 10,
+                "50+years": 7
+            },
+            "accessToEducation": "5"
+        }
+    },
+    "indicator": {
+        "informalityIndicator": 42.194567146109556,
+        "siteIndicator": 51.431459735416716,
+        "architectureIndicator": 30.491102017763364,
+        "populaceIndicator": 44.66113968514858
+    }
+}
