@@ -21,6 +21,9 @@ The script Grid/edit_types.py edits the technologies with the types defined on l
 To Desinstall and install Brix: Bash reinstall_brix.sh
 List installed packages: pip list
 Upgrade package: pip install --upgrade PackageName
+show: ls
+open folder: cd
+go back folder: cd -
 
 
 # Explanation by file
