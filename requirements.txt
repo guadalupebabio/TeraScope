@@ -1,2 +1,2 @@
--e git://github.com/CityScope/CS_Brix.git@grid_maker#egg=cs_brix
+cs_brix>=0.0.10
 vincenty==0.1.4
